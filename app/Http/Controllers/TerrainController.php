@@ -92,17 +92,5 @@ class TerrainController extends Controller
         }
     }
 
-    public function terrainsPaginate()
-    {
-        try {
-            $perPage = request()->input('pageSize', 10);
-            $terrains = Terrain::with('club')->paginate($perPage);
-            return response()->json([
-                'terrains' => $terrains->items(),
-                'totalPages' => $terrains->lastPage(),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json("Sélection impossible {$e->getMessage()}");
-        }
-    }
+
 }

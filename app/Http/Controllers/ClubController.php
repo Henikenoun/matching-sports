@@ -91,18 +91,14 @@ class ClubController extends Controller
             return response()->json("Sélection impossible {$e->getMessage()}");
         }
     }
-
-    public function clubsPaginate()
+    public function showTerrainsInClub($id)
     {
         try {
-            $perPage = request()->input('pageSize', 10);
-            $clubs = Club::with('terrains')->paginate($perPage);
-            return response()->json([
-                'clubs' => $clubs->items(),
-                'totalPages' => $clubs->lastPage(),
-            ]);
+            $club = Club::with('terrains')->findOrFail($id);
+            return response()->json($club->terrains);
         } catch (\Exception $e) {
-            return response()->json("Sélection impossible {$e->getMessage()}");
+            return response()->json("Problème de récupération des terrains {$e->getMessage()}");
         }
     }
+
 }
