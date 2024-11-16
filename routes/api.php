@@ -1,16 +1,15 @@
 <?php
+use App\Http\Controllers\AuthController;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'users'
+], function ($router) {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refreshToken', [AuthController::class, 'refresh']);
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+});
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-
-
-Route::get('/comptes', 'App\Http\Controllers\CompteController@index');
-Route::post('/comptes', 'App\Http\Controllers\CompteController@store');
-Route::get('/comptes/{id}', 'App\Http\Controllers\CompteController@show');
-Route::put('/comptes/{id}', 'App\Http\Controllers\CompteController@update');
-Route::delete('/comptes/{id}', 'App\Http\Controllers\CompteController@destroy');
+Route::get('users/verify-email', [AuthController::class, 'verifyEmail'])->name('verify.email');
