@@ -1,14 +1,10 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateTerrainsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('terrains', function (Blueprint $table) {
@@ -16,21 +12,15 @@ return new class extends Migration
             $table->timestamps();
             $table->string('nom');
             $table->string('type');
-            $table->string('disponibilite');
+            $table->boolean('disponibilite')->default(true); // Set default value to true
             $table->integer('capacite');
             $table->integer('fraisLocation');
-            $table->foreignId('clubId')
-            ->on('clubs')
-            ->onDelete('restrict');
-
+            $table->foreignId('club_id')->constrained('clubs')->onDelete('restrict');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('terrains');
     }
-};
+}

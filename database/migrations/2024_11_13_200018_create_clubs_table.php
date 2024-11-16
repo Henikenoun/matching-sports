@@ -1,14 +1,10 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateClubsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('clubs', function (Blueprint $table) {
@@ -18,17 +14,13 @@ return new class extends Migration
             $table->string('ville');
             $table->string('adresse');
             $table->string('numTel');
-            $table->string('email');
-            $table->integer('nbTerrain');
-            
+            $table->string('email')->nullable();
+            $table->integer('nbTerrain')->default(0); // Set default value to 0
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('clubs');
     }
-};
+}

@@ -15,7 +15,8 @@ Route::post('/terrains', [TerrainController::class, 'store']);
 Route::get('/terrains/{id}', [TerrainController::class, 'show']);
 Route::delete('/terrains/{id}', [TerrainController::class, 'destroy']);
 Route::put('/terrains/{id}', [TerrainController::class, 'update']);
-
+Route::put('/terrains/{id}/disponibilite-false', [TerrainController::class, 'setDisponibiliteFalse']);
+Route::put('/terrains/{id}/disponibilite-true', [TerrainController::class, 'setDisponibiliteTrue']);
 // Routes for Club
 Route::get('/clubs', [ClubController::class, 'index']);
 Route::post('/clubs', [ClubController::class, 'store']);

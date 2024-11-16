@@ -13,7 +13,8 @@ class ClubController extends Controller
     public function index()
     {
         try {
-            $clubs = Club::with('terrains')->get(); // Inclut les terrains liés
+            // Retrieve all clubs with their associated terrains
+            $clubs = Club::with('terrains')->get();
             return response()->json($clubs, 200);
         } catch (\Exception $e) {
             return response()->json("Sélection impossible {$e->getMessage()}");
@@ -23,8 +24,17 @@ class ClubController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
+        $request->validate([
+            'nom' => 'required|string',
+            'ville' => 'required|string',
+            'adresse' => 'required|string',
+            'numTel' => 'required|string',
+            'email' => 'required|email',
+        ]);
+
         try {
             $club = new Club([
                 'nom' => $request->input('nom'),
@@ -32,7 +42,7 @@ class ClubController extends Controller
                 'adresse' => $request->input('adresse'),
                 'numTel' => $request->input('numTel'),
                 'email' => $request->input('email'),
-                'nbTerrain' => $request->input('nbTerrain'),
+                'nbTerrain' => 0, // Set default value to 0
             ]);
             $club->save();
             return response()->json($club);
@@ -82,23 +92,29 @@ class ClubController extends Controller
         }
     }
 
+    /**
+     * Display clubs by city.
+     */
     public function showClubsByCity($city)
     {
         try {
-            $clubs = Club::where('ville', $city)->with('terrains')->get();
+            $clubs = Club::where('ville', $city)->get();
             return response()->json($clubs);
         } catch (\Exception $e) {
             return response()->json("Sélection impossible {$e->getMessage()}");
         }
     }
+
+    /**
+     * Display terrains in a specific club.
+     */
     public function showTerrainsInClub($id)
     {
         try {
-            $club = Club::with('terrains')->findOrFail($id);
+            $club = Club::findOrFail($id);
             return response()->json($club->terrains);
         } catch (\Exception $e) {
             return response()->json("Problème de récupération des terrains {$e->getMessage()}");
         }
     }
-
 }

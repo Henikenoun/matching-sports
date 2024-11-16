@@ -25,16 +25,31 @@ class TerrainController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'nom' => 'required|string',
+            'type' => 'required|string',
+            'capacite' => 'required|integer',
+            'fraisLocation' => 'required|integer',
+            'club_id' => 'required|integer|exists:clubs,id', // Ensure club_id is included and exists
+        ]);
+
         try {
+            // Create the new terrain
             $terrain = new Terrain([
                 'nom' => $request->input('nom'),
                 'type' => $request->input('type'),
-                'disponibilite' => $request->input('disponibilite'),
+                'disponibilite' => $request->input('disponibilite', true), // Default to true if not provided
                 'capacite' => $request->input('capacite'),
                 'fraisLocation' => $request->input('fraisLocation'),
                 'club_id' => $request->input('club_id'),
             ]);
             $terrain->save();
+
+            // Increment the nbTerrain attribute of the associated club
+            $club = $terrain->club;
+            $club->nbTerrain += 1;
+            $club->save();
+
             return response()->json($terrain);
         } catch (\Exception $e) {
             return response()->json("Insertion impossible {$e->getMessage()}");
@@ -91,6 +106,26 @@ class TerrainController extends Controller
             return response()->json("Sélection impossible {$e->getMessage()}");
         }
     }
-
-
+    public function setDisponibiliteFalse($id)
+    {
+        try {
+            $terrain = Terrain::findOrFail($id);
+            $terrain->disponibilite = false;
+            $terrain->save();
+            return response()->json($terrain);
+        } catch (\Exception $e) {
+            return response()->json("Problème de modification de la disponibilité {$e->getMessage()}");
+        }
+    }
+    public function setDisponibilitetrue($id)
+    {
+        try {
+            $terrain = Terrain::findOrFail($id);
+            $terrain->disponibilite = true;
+            $terrain->save();
+            return response()->json($terrain);
+        } catch (\Exception $e) {
+            return response()->json("Problème de modification de la disponibilité {$e->getMessage()}");
+        }
+    }
 }

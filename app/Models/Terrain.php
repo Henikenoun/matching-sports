@@ -17,15 +17,19 @@ class Terrain extends Model
         'disponibilite',
         'capacite',
         'fraisLocation',
-        'clubId'
+        'club_id'
     ];
 
     protected $primaryKey = 'id';
 
     public $timestamps = true;
 
+    protected $casts = [
+        'disponibilite' => 'boolean', // Cast to boolean
+    ];
+
     public function club()
     {
-        return $this->belongsTo(Club::class, 'clubId');
+        return $this->belongsTo(Club::class, 'club_id');
     }
 }
