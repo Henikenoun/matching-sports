@@ -1,22 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use Validator;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
@@ -36,11 +32,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -57,17 +48,16 @@ class AuthController extends Controller
             'availability' => 'required|boolean',
             'transport' => 'required|boolean',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-    
+
         $user = User::create(array_merge(
             $validator->validated(),
             ['password' => bcrypt($request->password)]
         ));
-    
-        // Envoyer l'email de vérification
+
         $verificationUrl = route('verify.email', ['email' => $user->email]);
         Mail::send([], [], function ($message) use ($user, $verificationUrl) {
             $message->to($user->email)
@@ -76,14 +66,13 @@ class AuthController extends Controller
                         <h4>Veuillez vérifier votre email pour continuer...</h4>
                         <a href='{$verificationUrl}'>Cliquez ici</a>");
         });
-    
+
         return response()->json([
             'message' => 'User successfully registered. Please verify your email.',
             'user' => $user
         ], 201);
     }
 
-    // Method verify Email
     public function verifyEmail(Request $request)
     {
         $user = User::where('email', $request->query('email'))->first();
@@ -111,11 +100,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout()
     {
         $this->guard()->logout();
@@ -126,41 +110,21 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Return auth guard
-     */
     private function guard()
     {
         return Auth::guard();
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
         return $this->createNewToken(auth('api')->refresh());
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function userProfile()
     {
         return response()->json(auth('api')->user());
     }
 
-    /**
-     * Get the token array structure.
-     *
-     * @param string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     protected function createNewToken($token)
     {
         return response()->json([

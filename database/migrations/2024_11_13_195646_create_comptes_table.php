@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('comptes', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
-            $table->string('prénom');
-            $table->date('date de naissance');
-            $table->string('ville');
-            $table->string('numéro de téléphone');
-            $table->string('email');
-            $table->string('mot de passe');
-            $table->boolean('confirmed')->nullable()->default(false);('transport');
-            $table->string('photo');
-            $table->boolean('confirmed')->nullable()->default(false);('disponibilité');
-            $table->timestamps();
+        $table->string('nom');
+        $table->string('prénom');
+        $table->date('date de naissance');
+        $table->string('ville');
+        $table->string('numéro de téléphone');
+        $table->string('email');
+        $table->string('mot de passe');
+        $table->boolean('confirmed')->nullable()->default(false);
+        $table->string('photo');
+        $table->string('transport');
+        $table->string('disponibilité');
+        $table->timestamps();
             
         });
     }
