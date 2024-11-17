@@ -21,12 +21,11 @@ class reservation extends Model
         "Participants"
     ];
 
-    //public function Terain()
-    //{ 
-      //  return $this->belongsTo(  Terain::class ,"ID"); 
-    //}
+    public function Terain()
+    { 
+       return $this->belongsTo(  Terrain::class ,"ID"); 
+    }
        
-    //relation avec participant 
  
 
 

@@ -13,10 +13,10 @@ class Evenement extends Model
     ,'prixUnitaire','responsable','participant','raison'];
 
 
-    // public function terrain()
-    // { 
-    //     return $this->belongsTo(Terrain::class,"IDTerrain"); 
-    // }
+    public function terrain()
+    { 
+        return $this->belongsTo(Terrain::class,"IDTerrain"); 
+    }
 
     public function particpant()
     { 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\ReservationController;
@@ -20,20 +21,27 @@ Route::middleware('api')->group(function () {
     });
 
     // Routes for Terrain
-Route::get('/terrains', [TerrainController::class, 'index']);
-Route::post('/terrains', [TerrainController::class, 'store']);
-Route::get('/terrains/{id}', [TerrainController::class, 'show']);
-Route::delete('/terrains/{id}', [TerrainController::class, 'destroy']);
-Route::put('/terrains/{id}', [TerrainController::class, 'update']);
+Route::middleware('api')->group(function () {
+    Route::resource('terrains', TerrainController::class);
+    });
 Route::put('/terrains/{id}/disponibilite-false', [TerrainController::class, 'setDisponibiliteFalse']);
 Route::put('/terrains/{id}/disponibilite-true', [TerrainController::class, 'setDisponibiliteTrue']);
 // Routes for Club
-Route::get('/clubs', [ClubController::class, 'index']);
-Route::post('/clubs', [ClubController::class, 'store']);
-Route::get('/clubs/{id}', [ClubController::class, 'show']);
-Route::delete('/clubs/{id}', [ClubController::class, 'destroy']);
-Route::put('/clubs/{id}', [ClubController::class, 'update']);
+Route::middleware('api')->group(function () {
+    Route::resource('clubs', TerrainController::class);
+    });
 Route::get('/clubs/city/{city}', [ClubController::class, 'showClubsByCity']);
 Route::get('/clubs/{id}/terrains', [ClubController::class, 'showTerrainsInClub']);
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'users'
+], function ($router) {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refreshToken', [AuthController::class, 'refresh']);
+    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+});
 
 ?>
