@@ -13,7 +13,7 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            $reservation=reservation::all()->with('terrain')->get();
+            $reservation=reservation::with('terrain')->get();
             return response()->json($reservation);
         } catch (\Exception $e) {
         return response()->json("probleme de récupération de la liste des reservation");

@@ -28,6 +28,8 @@ class EvenementController extends Controller
      */
 
 
+//ajoute partiscipant
+//nb =0
     public function store(Request $request)
     {
         try {
@@ -42,7 +44,7 @@ class EvenementController extends Controller
                 "photo"=>$request->input("photo"),
                 "prixUnitaire"=>$request->input("prixUnitaire"),
                 "responsable"=>$request->input("responsable"),
-                "participant"=>$request->input("participant"),
+                // "participant"=>$request->input("participant"),
                 "raison"=>$request->input("raison"),
 
             ]);

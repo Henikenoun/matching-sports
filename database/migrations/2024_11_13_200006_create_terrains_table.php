@@ -15,7 +15,8 @@ class CreateTerrainsTable extends Migration
             $table->boolean('disponibilite')->default(true); // Set default value to true
             $table->integer('capacite');
             $table->integer('fraisLocation');
-            $table->foreignId('club_id')->constrained('clubs')->onDelete('restrict');
+            $table->unsignedBigInteger('club_id'); // Foreign key
+            $table->foreign('club_id')->references('id')->on('clubs')->onDelete('restrict'); // Correction ici
         });
     }
 

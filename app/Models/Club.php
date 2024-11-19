@@ -28,4 +28,8 @@ class Club extends Model
     {
         return $this->hasMany(Terrain::class, 'club_id');
     }
+    public function reservation()
+    {
+        return $this->hasMany(reservation::class, 'club_id');
+    }
 }

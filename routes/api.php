@@ -28,7 +28,7 @@ Route::put('/terrains/{id}/disponibilite-false', [TerrainController::class, 'set
 Route::put('/terrains/{id}/disponibilite-true', [TerrainController::class, 'setDisponibiliteTrue']);
 // Routes for Club
 Route::middleware('api')->group(function () {
-    Route::resource('clubs', TerrainController::class);
+    Route::resource('clubs', ClubController::class);
     });
 Route::get('/clubs/city/{city}', [ClubController::class, 'showClubsByCity']);
 Route::get('/clubs/{id}/terrains', [ClubController::class, 'showTerrainsInClub']);
