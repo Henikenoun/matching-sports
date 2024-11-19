@@ -104,7 +104,8 @@ class ReservationController extends Controller
             return response()->json("Problème de suppression de la réservation", 500);
         }
     }
-    
+    //disponibilité de terrain lezmou true
+    //notification 48h
     public function Annuler($id){
         try {
             $reservation = Reservation::findOrFail($id);
