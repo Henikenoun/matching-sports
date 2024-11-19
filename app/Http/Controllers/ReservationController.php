@@ -27,7 +27,6 @@ class ReservationController extends Controller
     {
         try {
             $reservation=new reservation([
-                "ID"=>$request->input("ID"),
                 "User_Reserve"=>$request->input("User_Reserve"),
                 "Nom_Club"=>$request->input("Nom_Club"),
                 "Nb_Place"=>$request->input("Nb_Place"),
@@ -36,6 +35,9 @@ class ReservationController extends Controller
                 "Date_Reservation"=>$request->input("Date_Reservation"),
                 "Date_TempsReel"=>$request->input("Date_TempsReel"),
                 "Participants"=>$request->input("Participants"),
+                "ispaye"=>$request->input("ispaye"),
+                "Club_id"=>$request->input("Club_id"),
+                "terrain_id"=>$request->input("terrain_id"),
 
             ]);
             $reservation->save();
@@ -43,7 +45,7 @@ class ReservationController extends Controller
             
             
         } catch (\Exception $e) {
-           return response()->json("insertion impossible");
+           return response()->json($e->getMessage());
         }
     }
 

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string("User_Reserve");
             $table->integer("Nb_Place");
-            $table->boolean("Complet");
-            $table->boolean("ispaye");
+            $table->boolean("Complet")->default(false);
+            $table->boolean("ispaye")->default(false);
             $table->string("Type");
             $table->date("Date_Reservation");
             $table->date("Date_TempsReel");
