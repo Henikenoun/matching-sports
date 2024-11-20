@@ -117,7 +117,14 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return $this->createNewToken(auth('api')->refresh());
+        try {
+           
+
+            $newToken = auth('api')->refresh();
+            return $this->createNewToken($newToken);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not refresh token'], 401);
+        }
     }
 
     public function userProfile()
