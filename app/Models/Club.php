@@ -32,4 +32,8 @@ class Club extends Model
     {
         return $this->hasMany(reservation::class, 'club_id');
     }
+    public function evenement()
+    {
+        return $this->hasMany(Evenement::class, 'club_id');
+    }
 }

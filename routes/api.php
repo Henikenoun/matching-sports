@@ -20,6 +20,10 @@ Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
     });
 
+
+    Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
+
+
     // Routes for Terrain
 Route::middleware('api')->group(function () {
     Route::resource('terrains', TerrainController::class);
@@ -43,5 +47,6 @@ Route::group([
     Route::post('/refreshToken', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
 });
+
 
 ?>
