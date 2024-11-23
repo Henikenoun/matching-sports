@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->string("User_Reserve");
+            //place el mawjoudin w comparihom bel place de terrain bech taraf el place dispo
             $table->integer("Nb_Place");
             $table->boolean("Complet")->default(false);
             $table->boolean("ispaye")->default(false);
+            //foot -volley ....
             $table->string("Type");
             $table->date("Date_Reservation");
             $table->date("Date_TempsReel");

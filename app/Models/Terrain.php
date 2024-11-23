@@ -34,7 +34,7 @@ class Terrain extends Model
     }
     public function reservation()
     {
-        return $this->hasMany(Reservation::class, 'club_id');
+        return $this->hasMany(Reservation::class, 'terrain_id');
     }
     public function evenement()
     {

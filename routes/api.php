@@ -48,5 +48,17 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
 });
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-scheduler', function (Request $request) {
+    $secret = $request->query('secret');
+    if ($secret !== env('CRON_SECRET')) {
+        return response()->json(['error' => 'Accès non autorisé'], 403);
+    }
+
+    Artisan::call('reservations:supprimer');
+    return response()->json(['message' => 'Tâche exécutée avec succès']);
+});
+
 
 ?>
