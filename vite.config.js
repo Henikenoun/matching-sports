@@ -8,4 +8,7 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        outDir: 'dist', // Par défaut, mais assurez-vous que c'est bien là
+      },
 });
