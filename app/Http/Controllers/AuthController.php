@@ -40,7 +40,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
             'password_confirmation' => 'required|string',
-            'role' => 'required|string|in:admin,user',
+            'role' => 'required|string|in:admin,user,owner',
             'date_of_birth' => 'required|date',
             'city' => 'required|string|max:100',
             'phone_number' => 'required|string|max:20',
@@ -127,10 +127,16 @@ class AuthController extends Controller
         }
     }
 
-    public function userProfile()
-    {
-        return response()->json(auth('api')->user());
+    public function userProfile(Request $request)
+{
+    $user = auth()->user(); // Ensure the user is authenticated
+    if ($user) {
+        return response()->json($user); // Return the user profile
+    } else {
+        return response()->json(['error' => 'No user found'], 404);
     }
+}
+
 
     protected function createNewToken($token)
     {
@@ -140,5 +146,37 @@ class AuthController extends Controller
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'user' => auth()->user()
         ]);
+    }
+
+    public function editProfile(Request $request)
+    {
+        $user = auth('api')->user();
+    
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|between:2,100',
+            'surname' => 'sometimes|required|string|between:2,100',
+            'email' => 'sometimes|required|string|email|max:100|unique:users,email,' . $user->id,
+            'password' => 'sometimes|required|string|confirmed|min:6',
+            'date_of_birth' => 'sometimes|required|date',
+            'city' => 'sometimes|required|string|max:100',
+            'phone_number' => 'sometimes|required|string|max:20',
+            'photo' => 'nullable|string',
+            'availability' => 'sometimes|required|boolean',
+            'transport' => 'sometimes|required|boolean',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+    
+        $data = $validator->validated();
+        unset($data['isActive'], $data['role']);
+    
+        $user->update($data);
+    
+        return response()->json([
+            'message' => 'Profile successfully updated.',
+            'user' => $user
+        ], 200);
     }
 }

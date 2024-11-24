@@ -10,6 +10,7 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refreshToken', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::put('/edit-profile', [AuthController::class, 'editProfile']);
 });
 
 Route::get('users/verify-email', [AuthController::class, 'verifyEmail'])->name('verify.email');
