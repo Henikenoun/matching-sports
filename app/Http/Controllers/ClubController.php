@@ -33,6 +33,8 @@ class ClubController extends Controller
             'adresse' => 'required|string',
             'numTel' => 'required|string',
             'email' => 'required|email',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
 
         try {
@@ -43,6 +45,8 @@ class ClubController extends Controller
                 'numTel' => $request->input('numTel'),
                 'email' => $request->input('email'),
                 'nbTerrain' => 0, // Set default value to 0
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude')
             ]);
             $club->save();
             return response()->json($club);

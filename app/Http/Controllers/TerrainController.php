@@ -106,4 +106,26 @@ class TerrainController extends Controller
             return response()->json("Sélection impossible {$e->getMessage()}");
         }
     }
+    public function setDisponibiliteFalse($id)
+    {
+        try {
+            $terrain = Terrain::findOrFail($id);
+            $terrain->disponibilite = false;
+            $terrain->save();
+            return response()->json($terrain);
+        } catch (\Exception $e) {
+            return response()->json("Problème de modification de la disponibilité {$e->getMessage()}");
+        }
+    }
+    public function setDisponibilitetrue($id)
+    {
+        try {
+            $terrain = Terrain::findOrFail($id);
+            $terrain->disponibilite = true;
+            $terrain->save();
+            return response()->json($terrain);
+        } catch (\Exception $e) {
+            return response()->json("Problème de modification de la disponibilité {$e->getMessage()}");
+        }
+    }
 }

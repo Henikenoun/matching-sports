@@ -13,10 +13,10 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            $reservation=reservation::with('terrain')->get();
+            $reservation=reservation::all()->with('terrain')->get();
             return response()->json($reservation);
         } catch (\Exception $e) {
-        return response()->json($e->getMessage(),400);
+        return response()->json("probleme de récupération de la liste des reservation");
         }
     }
 
@@ -27,17 +27,15 @@ class ReservationController extends Controller
     {
         try {
             $reservation=new reservation([
+                "ID"=>$request->input("ID"),
                 "User_Reserve"=>$request->input("User_Reserve"),
-                "Nom_Club"=>$request->input("Nom_Club"),
+                
                 "Nb_Place"=>$request->input("Nb_Place"),
                 "Complet"=>$request->input("Complet"),
                 "Type"=>$request->input("Type"),
                 "Date_Reservation"=>$request->input("Date_Reservation"),
                 "Date_TempsReel"=>$request->input("Date_TempsReel"),
                 "Participants"=>$request->input("Participants"),
-                "ispaye"=>$request->input("ispaye"),
-                "Club_id"=>$request->input("Club_id"),
-                "terrain_id"=>$request->input("terrain_id"),
 
             ]);
             $reservation->save();
@@ -45,7 +43,7 @@ class ReservationController extends Controller
             
             
         } catch (\Exception $e) {
-           return response()->json($e->getMessage(),400);
+           return response()->json("insertion impossible");
         }
     }
 
@@ -59,7 +57,7 @@ class ReservationController extends Controller
             return response()->json($reservation);
             
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(),400);
+            return response()->json("probleme de récupération des données");
         }
     }
 
@@ -74,7 +72,7 @@ class ReservationController extends Controller
             return response()->json($reservation);
 
         } catch (\Exception $e) {
-            return response()->json($e->getMessage(),400);
+            return response()->json("probleme de modification");
         }
     }
 
@@ -97,7 +95,7 @@ class ReservationController extends Controller
             if ($interval->invert == 0 && $hoursDifference > 24) {
                 // If the reservation date is more than 24 hours away
                 $reservation->delete();
-                return response()->json("Réservation supprimée avec succès" , 200);
+                return response()->json("Réservation supprimée avec succès");
             } else {
                 return response()->json("La suppression n'est autorisée que plus de 24 heures avant la date de réservation", 403);
             }
@@ -106,44 +104,19 @@ class ReservationController extends Controller
             return response()->json("Problème de suppression de la réservation", 500);
         }
     }
-    //disponibilité de terrain lezmou true
-    //notification 48h
-    public function supprimerReservationsNonPayees()
-    {
+    
+    public function Annuler($id){
         try {
-            // Obtenir la date et l'heure actuelles
-            $now = new \DateTime();
-
-            // Calculer la limite des 24 heures
-            $limit = clone $now;
-            $limit->modify('-24 hours');
-
-            // Rechercher les réservations non payées et datant de plus de 24 heures
-            $reservations = Reservation::where('ispaye', false)
-                ->where('created_at', '<', $limit->format('Y-m-d H:i:s'))
-                ->get();
-
-            foreach ($reservations as $reservation) {
-                // Envoyer une notification avant suppression
-                $this->envoyerNotification($reservation);
-                
-                // Supprimer la réservation
+            $reservation = Reservation::findOrFail($id);
+            if (!$reservation->ispaye) {
                 $reservation->delete();
+                return response()->json("Réservation supprimée car elle ne sont pas payée");
             }
-
-            return "Réservations non payées supprimées avec succès.";
         } catch (\Exception $e) {
-            return "Erreur lors de la suppression des réservations : " . $e->getMessage();
+            return response()->json("Problème de suppression de la réservation", 500);
         }
+        
     }
-
-    private function envoyerNotification($reservation)
-    {
-        // Exemple simple : écrire un message (vous pouvez utiliser un service de notification comme Mail ou SMS)
-        echo "Notification : La réservation avec ID {$reservation->id} a été supprimée car elle n'était pas payée.\n";
-    }
-
-
 
 
 

@@ -13,14 +13,13 @@ class EvenementController extends Controller
     public function index()
     {
         try {
-            // $evenements=Evenement::all();
-            // $evenements=Evenement::with('participant')->get();
+            $evenements=Evenement::with('terrain')->get();
+            $evenements=Evenement::with('participant')->get();
             $evenements=Evenement::with('responsable')->get();
-            $evenements=Evenement::with('club')->get();
         
             return response()->json($evenements);
         } catch (\Exception $e) {
-        return response()->json($e->getMessage());
+        return response()->json("probleme de récupération de la liste des évenements");
         }
     }
 
@@ -33,8 +32,7 @@ class EvenementController extends Controller
     {
         try {
             $evenement=new Evenement([
-                "terrain_id"=>$request->input("terrain_id"),
-                "club_id"=>$request->input("club_id"),
+                "IDTerrain"=>$request->input("IDTerrain"),
                 "nom"=>$request->input("nom"),
                 "type"=>$request->input("type"),
                 "nombreMax"=>$request->input("nombreMax"),
@@ -44,7 +42,7 @@ class EvenementController extends Controller
                 "photo"=>$request->input("photo"),
                 "prixUnitaire"=>$request->input("prixUnitaire"),
                 "responsable"=>$request->input("responsable"),
-                //"participant"=>$request->input("participant"),
+                "participant"=>$request->input("participant"),
                 "raison"=>$request->input("raison"),
 
             ]);
@@ -53,43 +51,16 @@ class EvenementController extends Controller
             
             
         } catch (\Exception $e) {
-           return response()->json($e->getMessage());
+           return response()->json("insertion impossible");
         }
     }
-
-    public function ajouterParticipant(Request $request,$id)
-    {
-        try {
-            $evenement=Evenement::findorFail($id);
-            if($evenement->nbActuel<$evenement->nombreMax)
-            {
-                $evenement->nbActuel=$evenement->nbActuel+1;
-                $evenement->participant=$request->input("participant");
-                $evenement->save();
-                return response()->json($evenement);
-            }
-            else
-            {
-                return response()->json("nombre maximal de participants atteint");
-            }
-        } catch (\Exception $e) {
-            return response()->json("probleme d'ajout de participant");
-        }
-    }
-    
-
 
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
-        try {
-            $evenement=Evenement::findorFail($id);
-            return response()->json($evenement);
-        } catch (\Exception $e) {
-            return response()->json("probleme de récupération de l'evenement");
-        }
+       //
     }
 
     /**

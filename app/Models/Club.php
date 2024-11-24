@@ -17,7 +17,9 @@ class Club extends Model
         'adresse',
         'numTel',
         'email',
-        'nbTerrain'
+        'nbTerrain',
+        'latitude',
+        'longitude'
     ];
 
     protected $primaryKey = 'id';
@@ -27,13 +29,5 @@ class Club extends Model
     public function terrains()
     {
         return $this->hasMany(Terrain::class, 'club_id');
-    }
-    public function reservation()
-    {
-        return $this->hasMany(reservation::class, 'club_id');
-    }
-    public function evenement()
-    {
-        return $this->hasMany(Evenement::class, 'club_id');
     }
 }
