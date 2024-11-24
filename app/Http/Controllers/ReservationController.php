@@ -29,7 +29,7 @@ class ReservationController extends Controller
             $reservation=new reservation([
                 "ID"=>$request->input("ID"),
                 "User_Reserve"=>$request->input("User_Reserve"),
-                "Nom_Club"=>$request->input("Nom_Club"),
+                
                 "Nb_Place"=>$request->input("Nb_Place"),
                 "Complet"=>$request->input("Complet"),
                 "Type"=>$request->input("Type"),

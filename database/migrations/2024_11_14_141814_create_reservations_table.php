@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->string("User_Reserve");
-            $table->string("Nom_Club");
             $table->integer("Nb_Place");
             $table->boolean("Complet");
             $table->boolean("ispaye");
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreign("ID")
             ->references('id')
-            ->on('Terain')
+            ->on('terrains')
             ->onDelete('restrict');
         });
     }

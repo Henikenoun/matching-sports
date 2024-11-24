@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('mot de passe');
             $table->boolean('confirmed')->nullable()->default(false);('transport');
             $table->string('photo');
-            $table->boolean('confirmed')->nullable()->default(false);('disponibilité');
+           // $table->boolean('confirmed')->nullable()->default(false);('disponibilité');
             $table->timestamps();
             
         });
