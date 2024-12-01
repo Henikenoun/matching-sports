@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TerrainController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\ShopController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +51,7 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refreshToken', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::put('/edit-profile', [AuthController::class, 'editProfile']);
 });
 
 // Routes for Chat
@@ -56,4 +61,30 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/conversations', [ChatController::class, 'store']);
 });
 
+// Routes for categories
+Route::middleware('api')->group(function () {
+    Route::resource('categories', CategorieController::class);
+});
+
+// Routes for shop
+Route::middleware('api')->group(function () {
+    Route::resource('shops', ShopController::class);
+});
+Route::post('/shops/{id}/add-photos', [ShopController::class, 'addPhotos']);
+Route::get('/shops/{shopId}/categories', [ShopController::class, 'getCategoriesByShop']);
+Route::get('/shops/{shopId}/categories/{categoryId}/articles', [ShopController::class, 'getArticlesByCategoryAndShop']);
+
+
+// Routes for articles
+Route::middleware('api')->group(function () {
+    Route::resource('articles', ArticleController::class);
+});
+Route::post('/articles/{id}/add-color', [ArticleController::class, 'addColor']);
+
+
+// Routes for demandes
+Route::post('/demandes', [DemandeController::class, 'createDemande']);
+Route::get('/demandes/{id}', [DemandeController::class, 'getDemandeDetails']);
+Route::get('/user/{userId}/demandes', [DemandeController::class, 'getAllDemandesByUser']);
+Route::get('/demandes', [DemandeController::class, 'getAllDemandes']);
 ?>

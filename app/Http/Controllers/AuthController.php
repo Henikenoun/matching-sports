@@ -1,25 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-// use Validator;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Validator;
-// use JWTAuth;
+use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
@@ -39,11 +32,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -52,7 +40,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
             'password_confirmation' => 'required|string',
-            'role' => 'required|string|in:admin,user',
+            'role' => 'required|string|in:admin,user,owner',
             'date_of_birth' => 'required|date',
             'city' => 'required|string|max:100',
             'phone_number' => 'required|string|max:20',
@@ -60,17 +48,16 @@ class AuthController extends Controller
             'availability' => 'required|boolean',
             'transport' => 'required|boolean',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-    
+
         $user = User::create(array_merge(
             $validator->validated(),
             ['password' => bcrypt($request->password)]
         ));
-    
-        // Envoyer l'email de vérification
+
         $verificationUrl = route('verify.email', ['email' => $user->email]);
         Mail::send([], [], function ($message) use ($user, $verificationUrl) {
             $message->to($user->email)
@@ -79,14 +66,13 @@ class AuthController extends Controller
                         <h4>Veuillez vérifier votre email pour continuer...</h4>
                         <a href='{$verificationUrl}'>Cliquez ici</a>");
         });
-    
+
         return response()->json([
             'message' => 'User successfully registered. Please verify your email.',
             'user' => $user
         ], 201);
     }
 
-    // Method verify Email
     public function verifyEmail(Request $request)
     {
         $user = User::where('email', $request->query('email'))->first();
@@ -114,11 +100,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout()
     {
         Auth::logout();
@@ -129,48 +110,73 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Return auth guard
-     */
     private function guard()
     {
         return Auth::guard();
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
-        return $this->createNewToken(JWTAuth::parseToken()->refresh());
+        try {
+           
+
+            $newToken = auth('api')->refresh();
+            return $this->createNewToken($newToken);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Could not refresh token'], 401);
+        }
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function userProfile()
-    {
-        return response()->json(auth('api')->user());
+    public function userProfile(Request $request)
+{
+    $user = auth()->user(); // Ensure the user is authenticated
+    if ($user) {
+        return response()->json($user); // Return the user profile
+    } else {
+        return response()->json(['error' => 'No user found'], 404);
     }
+}
 
-    /**
-     * Get the token array structure.
-     *
-     * @param string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     protected function createNewToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::parseToken()->getPayload()->get('exp') - time(),
-            'user' => auth()->guard('api')->user()
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => auth()->user()
         ]);
+    }
+
+    public function editProfile(Request $request)
+    {
+        $user = auth('api')->user();
+    
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|between:2,100',
+            'surname' => 'sometimes|required|string|between:2,100',
+            'email' => 'sometimes|required|string|email|max:100|unique:users,email,' . $user->id,
+            'password' => 'sometimes|required|string|confirmed|min:6',
+            'date_of_birth' => 'sometimes|required|date',
+            'city' => 'sometimes|required|string|max:100',
+            'phone_number' => 'sometimes|required|string|max:20',
+            'photo' => 'nullable|string',
+            'availability' => 'sometimes|required|boolean',
+            'transport' => 'sometimes|required|boolean',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+    
+        $data = $validator->validated();
+        unset($data['isActive'], $data['role']);
+    
+        $user->update($data);
+    
+        return response()->json([
+            'message' => 'Profile successfully updated.',
+            'user' => $user
+        ], 200);
     }
 }
