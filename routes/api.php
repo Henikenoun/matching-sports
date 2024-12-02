@@ -17,6 +17,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
 // Routes for Reservation
 Route::middleware('api')->group(function () {
     Route::resource('reservation', ReservationController::class);
@@ -50,9 +51,11 @@ Route::group([
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refreshToken', [AuthController::class, 'refresh']);
-    Route::get('/user-profile', [AuthController::class, 'userProfile']);
+    Route::middleware('auth:api')->get('/user-profile', [AuthController::class, 'getUserProfile']);
+    Route::get('/getAll', [AuthController::class, 'getall']);
     Route::put('/edit-profile', [AuthController::class, 'editProfile']);
 });
+Route::get('users/verify-email', [AuthController::class, 'verifyEmail'])->name('verify.email');
 
 // Routes for Chat
 Route::middleware('auth:api')->group(function () {

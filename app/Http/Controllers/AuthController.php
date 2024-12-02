@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-use JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Response;
 
@@ -34,6 +34,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        try{
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'surname' => 'required|string|between:2,100',
@@ -71,6 +72,11 @@ class AuthController extends Controller
             'message' => 'User successfully registered. Please verify your email.',
             'user' => $user
         ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'User registration failed! Please try again.',
+            'error' => $e->getMessage()
+        ], 409);}
     }
 
     public function verifyEmail(Request $request)
@@ -120,22 +126,44 @@ class AuthController extends Controller
         try {
            
 
-            $newToken = auth('api')->refresh();
+            $newToken = JWTAuth::refresh();
             return $this->createNewToken($newToken);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not refresh token'], 401);
         }
     }
 
-    public function userProfile(Request $request)
+    public function getall(Request $request)
 {
-    $user = auth()->user(); // Ensure the user is authenticated
+    $user =User::all(); // Ensure the user is authenticated
     if ($user) {
         return response()->json($user); // Return the user profile
     } else {
         return response()->json(['error' => 'No user found'], 404);
     }
 }
+public function getUserProfile()
+{
+    try {
+        $user = Auth::user();
+
+        if ($user) {
+            return response()->json([
+                'message' => 'User profile retrieved successfully.',
+                'user' => $user
+            ], 200);
+        } else {
+            return response()->json(['error' => 'No authenticated user found.'], 404);
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
 
 
     protected function createNewToken($token)
@@ -143,14 +171,14 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
-            'user' => auth()->user()
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            'user' => Auth::user()
         ]);
     }
 
-    public function editProfile(Request $request)
+    public function editProfile(Request $request,$id)
     {
-        $user = auth('api')->user();
+        $user = User::find($id);
     
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|between:2,100',
