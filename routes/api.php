@@ -14,3 +14,5 @@ Route::group([
 });
 
 Route::get('users/verify-email', [AuthController::class, 'verifyEmail'])->name('verify.email');
+
+
