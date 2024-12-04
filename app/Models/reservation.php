@@ -5,28 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
-class reservation extends Model
+class Reservation extends Model
 {
     use HasFactory;
-    protected $fillable=[
+
+    protected $fillable = [
         "User_Reserve",
-        "Nom_Club",
         "Nb_Place",
         "Complet",
         "Type",
         "Date_Reservation",
         "Date_TempsReel",
         "ispaye",
-        "Participants"
+        "Participants",
+        "Club_id",
+        "terrain_id" // Convention pour la clé étrangère
     ];
 
-    public function Terain()
-    { 
-       return $this->belongsTo(  Terrain::class ,"ID"); 
+    public function terrain()
+    {
+        return $this->belongsTo(Terrain::class, 'terrain_id'); // Relation avec Terrain
     }
-       
- 
-
-
+    public function club()
+    {
+        return $this->belongsTo(Club::class, 'terrain_id'); // Relation avec Terrain
+    }
 }

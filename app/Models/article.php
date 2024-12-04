@@ -40,7 +40,7 @@ class Article extends Model
     }
     public function demandes()
 {
-    return $this->hasMany(Demande::class);
+    return $this->hasMany(DemandeP::class);
 }
 
 }

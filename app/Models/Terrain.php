@@ -32,4 +32,12 @@ class Terrain extends Model
     {
         return $this->belongsTo(Club::class, 'club_id');
     }
+    public function reservation()
+    {
+        return $this->hasMany(Reservation::class, 'terrain_id');
+    }
+    public function evenement()
+    {
+        return $this->hasMany(Evenement::class, 'terrain_id');
+    }
 }

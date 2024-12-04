@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Demande;
+
+use App\Models\DemandeP;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
-class DemandeController extends Controller
+class DemandePController extends Controller
 {
    /**
      * Ajouter une demande.
@@ -15,7 +16,7 @@ class DemandeController extends Controller
     public function createDemande(Request $request)
     {
         try {
-            $demande = Demande::create([
+            $demande = DemandeP::create([
                 'user_id' => $request->user_id,
                 'article_id' => $request->article_id,
                 'quantity' => $request->quantity,
@@ -40,7 +41,7 @@ class DemandeController extends Controller
     public function getDemandeDetails($id)
     {
         try {
-            $demande = Demande::with(['user', 'article'])->findOrFail($id);
+            $demande = DemandeP::with(['user', 'article'])->findOrFail($id);
 
             return response()->json($demande, 200); // 200 OK
         } catch (ModelNotFoundException $e) {
@@ -61,7 +62,7 @@ class DemandeController extends Controller
     public function getAllDemandesByUser($userId)
     {
         try {
-            $demandes = Demande::with('article')->where('user_id', $userId)->get();
+            $demandes = DemandeP::with('article')->where('user_id', $userId)->get();
 
             if ($demandes->isEmpty()) {
                 return response()->json([
@@ -84,7 +85,7 @@ class DemandeController extends Controller
     public function getAllDemandes()
     {
         try {
-            $demandes = Demande::with('article')
+            $demandes = DemandeP::with('article')
                 ->get()
                 ->map(function ($demande) {
                     $totalPrice = $demande->article->price * $demande->quantity;
