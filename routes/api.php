@@ -12,6 +12,10 @@ use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StripeController;
+
+Route::post('/payment/processpayment', [StripeController::class,
+'processPayment']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
