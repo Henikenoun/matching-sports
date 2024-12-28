@@ -12,7 +12,9 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;use HasFactory; use HasApiTokens;
+    use Notifiable;
+    use HasFactory;
+    use HasApiTokens;
 
     protected $fillable = [
         'name',
@@ -27,10 +29,12 @@ class User extends Authenticatable implements JWTSubject
         'photo',
         'availability',
         'transport',
+        'club_id',
     ];
 
     protected $hidden = [
-        'mot_de_passe', 'remember_token',
+        'mot_de_passe',
+        'remember_token',
     ];
 
     public function getJWTIdentifier()
@@ -43,8 +47,11 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
     public function demandes()
-{
-    return $this->hasMany(Demande::class);
-}
-
+    {
+        return $this->hasMany(Demande::class);
+    }
+    public function club()
+    {
+        return $this->belongsTo(Club::class);
+    }
 }

@@ -42,4 +42,8 @@ class Club extends Model
     {
         return $this->belongsTo(shop::class, 'shop_id');
     }
+    public function users()
+    {
+        return $this->hasMany(User::class, 'club_id');
+    }
 }
