@@ -9,19 +9,27 @@ class Evenement extends Model
 {
     use HasFactory ;
 
-    protected $fillable =['IDTerrain','nom','type','nombreMax','date','nbActuel','description','photo'
+    protected $fillable =['terrain_id','club_id','nom','type','nombreMax','date','nbActuel','description','photo'
     ,'prixUnitaire','responsable','participant','raison'];
 
 
     // public function terrain()
     // { 
-    //     return $this->belongsTo(Terrain::class,"IDTerrain"); 
+    //     return $this->hasMany(Terrain::class,"terrain_id"); 
     // }
 
-    public function particpant()
-    { 
-        return $this->belongsTo(User::class,"participant"); 
+    // public function club()
+    // { 
+    //     return $this->belongsTo(Club::class,"club_id"); 
+    // }
+
+
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'evenement_participant', 'evenement_id', 'participant_id');
     }
+
 
     public function responsable()
     { 
