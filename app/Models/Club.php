@@ -17,7 +17,9 @@ class Club extends Model
         'adresse',
         'numTel',
         'email',
-        'nbTerrain'
+        'nbTerrain',
+        'latitude',
+        'longitude'
     ];
 
     protected $primaryKey = 'id';
