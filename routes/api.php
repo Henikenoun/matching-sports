@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\ArticleController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategorieController;
-use App\Http\Controllers\ClubController;
+
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TerrainController;
@@ -30,6 +27,27 @@ Route::middleware('api')->group(function () {
 // Routes for Evenements
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
+
+    });
+
+
+    Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
+
+    Route::middleware('api')->group(function() {
+        Route::resource('equipes', EquipeController::class);
+    });
+    
+    Route::middleware('api')->group(function() {
+        Route::resource('demandes', DemandeController::class);
+        Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
+        Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
+    });
+    
+    // Route::middleware('api')->group(function() {
+    //     Route::resource('Users', DemandeController::class);
+    //     Route::put('/Users/{id}/status', [AuthController::class, 'updateAvailability']);
+    // });
+
 });
 
 // Routes for Terrain
@@ -96,3 +114,4 @@ Route::get('/demandes/{id}', [DemandeController::class, 'getDemandeDetails']);
 Route::get('/user/{userId}/demandes', [DemandeController::class, 'getAllDemandesByUser']);
 Route::get('/demandes', [DemandeController::class, 'getAllDemandes']);
 ?>
+
