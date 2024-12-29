@@ -13,22 +13,25 @@ class Evenement extends Model
     ,'prixUnitaire','responsable','participant','raison'];
 
 
-    // public function terrain()
-    // { 
-    //     return $this->hasMany(Terrain::class,"terrain_id"); 
-    // }
-
-    // public function club()
-    // { 
-    //     return $this->belongsTo(Club::class,"club_id"); 
-    // }
-
 
 
     public function participants()
     {
         return $this->belongsToMany(User::class, 'evenement_participant', 'evenement_id', 'participant_id');
+
+    public function terrain()
+    { 
+        return $this->hasMany(Terrain::class,"terrain_id"); 
     }
+
+    public function club()
+    { 
+        return $this->belongsTo(Club::class,"club_id"); 
+    }
+
+
+
+  
 
 
     public function responsable()

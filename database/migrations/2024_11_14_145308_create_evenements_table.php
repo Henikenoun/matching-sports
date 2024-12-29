@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('evenements', function (Blueprint $table) {
             $table->id();
+
         $table->unsignedBigInteger('terrain_id')->nullable();
         $table->unsignedBigInteger('club_id')->nullable();
         $table->string('nom')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration
         $table->string('photo')->nullable();
         $table->decimal('prixUnitaire', 8, 2)->nullable();
         $table->unsignedBigInteger('responsable')->nullable();
+
         $table->unsignedBigInteger('participant')->nullable();  
         $table->text('raison')->nullable();
         $table->timestamps();
