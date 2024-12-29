@@ -13,6 +13,16 @@ use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
+    //get user by id 
+    public function getUserById($id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            return response()->json($user);
+        } else {
+            return response()->json(['error' => 'No user found'], 404);
+        }
+    }
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');

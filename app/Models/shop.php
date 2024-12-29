@@ -12,7 +12,7 @@ class Shop extends Model
     protected $fillable = [
         'name',
         'desc',
-        'photo',
+        'photos',
         'url',
         'club_id'
     ];

@@ -47,6 +47,7 @@ Route::get('/clubs/city/{city}', [ClubController::class, 'showClubsByCity']);
 Route::get('/clubs/{id}/terrains', [ClubController::class, 'showTerrainsInClub']);
 
 // Routes for User Authentication
+Route::get('/users/{id}', [AuthController::class, 'getUserById']);
 Route::group([
     'middleware' => 'api',
     'prefix' => 'users'
