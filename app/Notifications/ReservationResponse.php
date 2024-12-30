@@ -1,40 +1,56 @@
 <?php
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\DatabaseMessage;
+use App\Models\Reservation;
 
 class ReservationResponse extends Notification
 {
-    private $reservation;
-    private $status;
+    use Queueable;
 
-    public function __construct($reservation, $status)
+    protected $reservation;
+    protected $responseType;
+
+    /**
+     * Create a new notification instance.
+     *
+     * @return void
+     */
+    public function __construct(Reservation $reservation, $responseType)
     {
         $this->reservation = $reservation;
-        $this->status = $status; // acceptée ou refusée
+        $this->responseType = $responseType;
     }
 
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['database'];
     }
 
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject("Réservation {$this->status}")
-            ->line("Votre réservation pour le terrain a été {$this->status}.")
-            ->action('Voir les détails', url("/reservations/{$this->reservation->id}"))
-            ->line('Merci pour votre patience.');
-    }
-
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function toArray($notifiable)
     {
+        $message = $this->responseType === 'accepted' 
+            ? 'Votre réservation a été acceptée.' 
+            : 'Votre réservation a été refusée.';
+
         return [
-            'message' => "Votre réservation a été {$this->status}.",
-            'reservation_id' => $this->reservation->id,
-            'status' => $this->status,
+            'reservation_id' => $this->reservation->ID,
+            'message' => $message,
         ];
     }
 }

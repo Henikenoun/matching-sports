@@ -9,7 +9,7 @@ class Evenement extends Model
 {
     use HasFactory ;
 
-    protected $fillable =['terrain_id','club_id','nom','type','nombreMax','date','nbActuel','description','photo'
+    protected $fillable =['terrain_id','Club_id','nom','type','nombreMax','date','nbActuel','description','photo'
     ,'prixUnitaire','responsable','participant','raison'];
 
 

@@ -25,7 +25,13 @@ Route::get('/user', function (Request $request) {
 // Routes for Reservation
 Route::middleware('api')->group(function () {
     Route::resource('reservation', ReservationController::class);
+    Route::post('/reservations/{id}/accept', [ReservationController::class, 'accept']);
+    Route::post('/reservations/{id}/refuse', [ReservationController::class, 'refuse']);
+
 });
+//routes pour accepter une reservation
+//Route::post('/reservations/{id}/accept', [ReservationController::class, 'accept']);
+
 
 // Routes for Evenements
 Route::middleware('api')->group(function () {

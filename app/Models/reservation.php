@@ -24,10 +24,10 @@ class Reservation extends Model
 
     public function terrain()
     {
-        return $this->belongsTo(Terrain::class, 'terrain_id'); // Relation avec Terrain
+        return $this->belongsTo(Terrain::class, ); // Relation avec Terrain
     }
     public function club()
     {
-        return $this->belongsTo(Club::class, 'terrain_id'); // Relation avec Terrain
+        return $this->belongsTo(Club::class, 'Club_id'); // Relation avec Terrain
     }
 }

@@ -1,42 +1,59 @@
 <?php
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Models\Reservation;
 
 class NewReservation extends Notification
 {
-    private $reservation;
+    use Queueable;
 
-    public function __construct($reservation)
+    protected $reservation;
+
+    /**
+     * Create a new notification instance.
+     *
+     * @return void
+     */
+    public function __construct(Reservation $reservation)
     {
         $this->reservation = $reservation;
     }
 
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function via($notifiable)
     {
-        return ['database', 'mail']; // Canal pour les notifications
+        return ['database'];
     }
 
-    public function toMail($notifiable)
-    {
-        return (new MailMessage)
-            ->subject('Nouvelle réservation')
-            ->line("Une nouvelle réservation a été effectuée pour votre terrain.")
-            ->line("Détails :")
-            ->line("Utilisateur : {$this->reservation->User_Reserve}")
-            ->line("Date : {$this->reservation->Date_Reservation}")
-            ->action('Voir les détails', url("/reservations/{$this->reservation->id}"))
-            ->line('Merci de vérifier la réservation.');
-    }
+    /**
+     * Get the mail representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return \Illuminate\Notifications\Messages\MailMessage
+     */
+    
 
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function toArray($notifiable)
     {
         return [
-            'message' => 'Nouvelle réservation pour votre terrain.',
-            'reservation_id' => $this->reservation->id,
-            'user' => $this->reservation->User_Reserve,
-            'date' => $this->reservation->Date_Reservation,
+            'reservation_id' => $this->reservation->ID,
+            'user_reserve' => $this->reservation->User_Reserve,
+            'date_reservation' => $this->reservation->Date_Reservation,
         ];
     }
 }
