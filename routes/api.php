@@ -1,11 +1,16 @@
 <?php
 
-
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TerrainController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ClubController;
 use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\DemandePController;
+use App\Http\Controllers\EquipeController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +33,7 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
 
-    });
+});
 
 
     Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
@@ -47,8 +52,6 @@ Route::middleware('api')->group(function () {
     //     Route::resource('Users', DemandeController::class);
     //     Route::put('/Users/{id}/status', [AuthController::class, 'updateAvailability']);
     // });
-
-});
 
 // Routes for Terrain
 Route::middleware('api')->group(function () {
@@ -109,9 +112,9 @@ Route::post('/articles/{id}/add-color', [ArticleController::class, 'addColor']);
 
 
 // Routes for demandes
-Route::post('/demandes', [DemandeController::class, 'createDemande']);
-Route::get('/demandes/{id}', [DemandeController::class, 'getDemandeDetails']);
-Route::get('/user/{userId}/demandes', [DemandeController::class, 'getAllDemandesByUser']);
-Route::get('/demandes', [DemandeController::class, 'getAllDemandes']);
+Route::post('/demandesP', [DemandePController::class, 'createDemande']);
+Route::get('/demandesP/{id}', [DemandePController::class, 'getDemandeDetails']);
+Route::get('/user/{userId}/demandesP', [DemandePController::class, 'getAllDemandesByUser']);
+Route::get('/demandesP', [DemandePController::class, 'getAllDemandes']);
 ?>
 
