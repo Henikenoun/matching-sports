@@ -58,6 +58,7 @@ class AuthController extends Controller
             'photo' => 'nullable|string',
             'availability' => 'required|boolean',
             'transport' => 'required|boolean',
+            'club_id' => 'nullable|exists:clubs,id',
         ]);
 
         if ($validator->fails()) {
