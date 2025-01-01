@@ -36,6 +36,7 @@ Route::middleware('api')->group(function () {
 // Routes for Evenements
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
+    Route::delete('/evenements/{id}/annuler', [EvenementController::class, 'annulerEvenement']);
 });
 
 // Routes for Terrain
