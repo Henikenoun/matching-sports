@@ -27,7 +27,7 @@ class ReservationController extends Controller
     {
         try {
             $reservation=new reservation([
-                "ID"=>$request->input("ID"),
+             
                 "User_Reserve"=>$request->input("User_Reserve"),
                 
                 "Nb_Place"=>$request->input("Nb_Place"),
@@ -36,6 +36,8 @@ class ReservationController extends Controller
                 "Date_Reservation"=>$request->input("Date_Reservation"),
                 "Date_TempsReel"=>$request->input("Date_TempsReel"),
                 "Participants"=>$request->input("Participants"),
+                "Club_id"=>$request->input("club_id"),
+                "terrain_id"=>$request->input("terrain_id")
 
             ]);
             $reservation->save();
@@ -43,7 +45,7 @@ class ReservationController extends Controller
             
             
         } catch (\Exception $e) {
-           return response()->json("insertion impossible");
+           return response()->json($e->getMessage());
         }
     }
 
@@ -65,17 +67,27 @@ class ReservationController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
-        try {
-            $reservation=reservation::findorFail($id);
-            $reservation->update($request->all());
-            return response()->json($reservation);
+{
+    try {
+        $reservation = Reservation::findOrFail($id);
 
-        } catch (\Exception $e) {
-            return response()->json("probleme de modification");
-        }
+        // Récupérer les participants actuels et les nouveaux participants
+        $currentParticipants = json_decode($reservation->Participants, true) ?? [];
+        $newParticipants = json_decode($request->input('Participants'), true) ?? [];
+
+        // Fusionner les participants actuels et les nouveaux participants
+        $updatedParticipants = array_merge($currentParticipants, $newParticipants);
+
+        // Mettre à jour le champ Participants
+        $reservation->Participants = json_encode($updatedParticipants);
+        $reservation->save();
+
+        return response()->json($reservation);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
-
+}
     /**
      * Remove the specified resource from storage.
      */
