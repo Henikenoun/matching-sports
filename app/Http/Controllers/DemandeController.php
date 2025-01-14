@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Demande;
 use Illuminate\Http\Request;
 use DateTime;
+use App\Models\User;
+use App\Notifications\DemandeResponse;
+use App\Notifications\NewDemande;
 
 class DemandeController extends Controller
 {
@@ -48,6 +51,11 @@ class DemandeController extends Controller
             ]);
     
             $demande->save();
+
+            // Récupération de l'utilisateur pour l'envoyer la notification
+        $user = User::find($validatedData["user_id"]);
+        $user->notify(new NewDemande($demande));
+
     
             return response()->json([
                 "message" => "Demande créée avec succès",
@@ -91,7 +99,36 @@ class DemandeController extends Controller
      */
     public function update(Request $request, Demande $demande)
     {
-        //
+        try {
+            // Validation des données entrantes
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'equipe_id' => 'required|exists:equipes,id',
+                'date' => 'required|date',
+            ]);
+
+            // Mise à jour de la demande existante
+            $demande->update([
+                "user_id" => $validatedData["user_id"],
+                "equipe_id" => $validatedData["equipe_id"],
+                "date" => $validatedData["date"],
+                "etat" => $request->input('etat', $demande->etat), // Conserver l'état actuel si non fourni
+            ]);
+
+            // Récupération de l'utilisateur pour l'envoyer la notification
+            $user = User::find($validatedData["user_id"]);
+            $user->notify(new NewDemande($demande));
+
+            return response()->json([
+                "message" => "Demande mise à jour avec succès",
+                "demande" => $demande,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Erreur lors de la mise à jour de la demande",
+                "error" => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -104,6 +141,7 @@ class DemandeController extends Controller
             
             $demande=Demande::findOrFail($id);
             $demande->delete();
+
             return response()->json("demande supprimée avec succes");
         } catch (\Exception $e) {
             return response()->json("probleme de suppression d'demande");
@@ -198,6 +236,9 @@ class DemandeController extends Controller
         // Suppression directe si l'état est "en cours" ou si les conditions sont remplies pour "acceptée"
 
         $demande->delete();
+      // Envoyer la notification d'annulation
+      $user->notify(new DemandeResponse($demande));
+
 
         return response()->json([
             "message" => "Demande annulée avec succès."
@@ -214,6 +255,44 @@ class DemandeController extends Controller
         ], 500);
     }
 }
+public function accept($id)
+    {
+        try {
+            // Recherche de la demande
+            $demande = Demande::findOrFail($id);
+            $user = $demande->user; // Relation définie entre Demande et User
+
+            // Vérification du statut de la demande
+            if ($demande->etat === 'en cours') {
+                $demande->etat = 'acceptée';
+                $user->availability = 0; // Mise à jour de la disponibilité de l'utilisateur
+                $user->save();
+            } else {
+                return response()->json([
+                    "message" => "Impossible de changer le statut en 'acceptée'. La demande est déjà acceptée.",
+                ], 400);
+            }
+
+            $demande->save();
+
+            // Envoyer la notification d'acceptation
+            $user->notify(new DemandeResponse($demande));
+
+            return response()->json([
+                "message" => "Demande acceptée avec succès."
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                "message" => "Demande introuvable",
+                "error" => $e->getMessage(),
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                "message" => "Erreur lors de l'acceptation de la demande",
+                "error" => $e->getMessage(),
+            ], 500);
+        }
+    }
 
     
 

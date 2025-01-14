@@ -46,4 +46,7 @@ class Club extends Model
     {
         return $this->hasMany(User::class, 'club_id');
     }
+    public function ratings(){
+        return $this->morphMany(Rating::class, 'rateable');
+    }
 }

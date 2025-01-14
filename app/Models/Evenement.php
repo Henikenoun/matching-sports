@@ -29,14 +29,12 @@ class Evenement extends Model
         return $this->belongsTo(Club::class,"club_id"); 
     }
 
-
-
-  
-
-
     public function responsable()
     { 
         return $this->belongsTo(User::class,"responsable"); 
+    }
+    public function ratings(){
+        return $this->morphMany(Rating::class, 'rateable');
     }
 
 

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Evenement;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewEvent;
+use App\Notifications\EventCancelled;
 
 class EvenementController extends Controller
 {
@@ -78,6 +81,12 @@ class EvenementController extends Controller
 
             ]);
             $evenement->save();
+             // Send notifications to all users
+             $users = User::all();
+             foreach ($users as $user) {
+                 $user->notify(new NewEvent($evenement));
+             }
+ 
             return response()->json($evenement);
             
             

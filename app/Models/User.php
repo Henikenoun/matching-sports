@@ -54,4 +54,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Club::class);
     }
+    public function ratings(){
+        return $this->morphMany(Rating::class, 'rateable');
+    }
 }

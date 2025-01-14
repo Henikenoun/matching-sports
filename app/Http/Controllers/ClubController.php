@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Club;
+use App\Models\Rating;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ClubController extends Controller
@@ -24,6 +26,47 @@ class ClubController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+     public function storeR(Request $request)
+     {
+         // Validation des données
+         $request->validate([
+             'rateable_id' => 'required|integer',
+             'rateable_type' => 'required|string',
+             'rating' => 'required|integer|min:1|max:5',
+             'review' => 'nullable|string',
+         ]);
+     
+         try {
+             // Vérifiez si l'utilisateur est authentifié
+             if (!Auth::check()) {
+                 return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+             }
+     
+             $userId = Auth::id();
+             
+             // Création de l'évaluation
+             $rating = new Rating([
+                 'user_id' => $userId,
+                 'rateable_id' => $request->input('rateable_id'),
+                 'rateable_type' => $request->input('rateable_type'),
+                 'rating' => $request->input('rating'),
+                 'review' => $request->input('review'),
+             ]);
+             
+             // Sauvegarde de l'évaluation
+             $rating->save();
+             
+             // Retourner la réponse avec l'évaluation
+             return response()->json([
+                 'message' => 'Évaluation ajoutée avec succès',
+                 'rating' => $rating
+             ]);
+             
+         } catch (\Exception $e) {
+             return response()->json(['error' => 'Erreur interne du serveur'], 500);
+         }
+     }
 
     public function store(Request $request)
     {

@@ -11,6 +11,8 @@ use App\Http\Controllers\ClubController;
 use App\Http\Controllers\DemandeController;
 use App\Http\Controllers\DemandePController;
 use App\Http\Controllers\EquipeController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +24,26 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// routes pour les notifications
+Route::get('/notificationsEvents', [NotificationController::class, 'showEventNotifications']);
+Route::get('/notifications/events/annulations', [NotificationController::class, 'showEventNotificationsAnnulation']);
+Route::get('/notifications/reservations/refus', [NotificationController::class, 'showReservationNotificationsRefus']);
+Route::get('/notifications/reservations/accept', [NotificationController::class, 'showReservationNotificationsAccept']);
+Route::get('/notifications/reservations/demande', [NotificationController::class, 'showReservationNotificationsDemande']);
+Route::get('/notifications/demandes', [NotificationController::class, 'showDemandeNotifications']);
+Route::get('/notifications/demandes/accept', [NotificationController::class, 'showDemandeNotificationsAccept']);
+Route::get('/notifications/demandes/refus', [NotificationController::class, 'showDemandeNotificationsRefus']);
+
+
+//route pour rating 
+Route::post('/ratings', [RatingController::class, 'store'])->middleware('auth:api'); // Ajouter une évaluation
+Route::post('/clubratings', [ClubController::class, 'storeR'])->middleware('auth:api'); // Ajouter une évaluation
+Route::get('/ratings/{type}/{id}', [RatingController::class, 'show']); // Récupérer les évaluations pour une entité spécifique
 // Routes for Reservation
 Route::middleware('api')->group(function () {
     Route::resource('reservation', ReservationController::class);
+    Route::post('/reservations/{id}/accept', [ReservationController::class, 'accept']);
+    Route::post('/reservations/{id}/refuse', [ReservationController::class, 'refuse']);
 });
 
 // Routes for Evenements

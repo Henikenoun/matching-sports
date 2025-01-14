@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\reservation;
+use App\Models\User;
+use App\Notifications\NewReservation;
+use App\Notifications\ReservationResponse;
 use Illuminate\Http\Request;
 
 class ReservationController extends Controller
@@ -41,6 +44,13 @@ class ReservationController extends Controller
 
             ]);
             $reservation->save();
+            // Récupérer le propriétaire du club depuis le modèle User
+            $clubOwner = User::where('club_id', $reservation->Club_id)->first();
+
+            // Envoyer la notification
+            if ($clubOwner) {
+                $clubOwner->notify(new NewReservation($reservation));
+            }
             return response()->json($reservation);
             
             
@@ -128,6 +138,41 @@ class ReservationController extends Controller
             return response()->json("Problème de suppression de la réservation", 500);
         }
         
+    }
+    public function accept($id)
+    {
+        try {
+            $reservation = Reservation::findOrFail($id);
+            $reservation->update(['status' => 'accepted']); // Assurez-vous d'avoir une colonne 'status' dans votre table 'reservations'
+
+            // Récupérer l'utilisateur qui a créé la réservation
+            $user = User::findOrFail($reservation->User_Reserve);
+
+            // Envoyer la notification
+            $user->notify(new ReservationResponse($reservation, 'accepted'));
+
+            return response()->json("Réservation acceptée avec succès");
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    public function refuse($id)
+    {
+        try {
+            $reservation = Reservation::findOrFail($id);
+            $reservation->update(['status' => 'refused']); // Assurez-vous d'avoir une colonne 'status' dans votre table 'reservations'
+
+            // Récupérer l'utilisateur qui a créé la réservation
+            $user = User::findOrFail($reservation->User_Reserve);
+
+            // Envoyer la notification
+            $user->notify(new ReservationResponse($reservation, 'refused'));
+
+            return response()->json("Réservation refusée avec succès");
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
     }
 
 
