@@ -27,6 +27,7 @@ class EvenementController extends Controller
             return response()->json($evenements);
         } catch (\Exception $e) {
         return response()->json($e->getMessage());
+<<<<<<< HEAD
         }
     }
 
@@ -50,6 +51,8 @@ class EvenementController extends Controller
                 'error' => 'Erreur lors de la récupération des événements',
                 'details' => $e->getMessage()
             ], 500); // 500 Internal Server Error
+=======
+>>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
         }
     }
 

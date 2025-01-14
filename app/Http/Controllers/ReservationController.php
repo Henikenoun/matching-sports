@@ -76,7 +76,11 @@ class ReservationController extends Controller
         $newParticipants = json_decode($request->input('Participants'), true) ?? [];
 
         // Fusionner les participants actuels et les nouveaux participants
+<<<<<<< HEAD
         $updatedParticipants = array_merge( $newParticipants);
+=======
+        $updatedParticipants = array_merge($currentParticipants, $newParticipants);
+>>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
 
         // Mettre à jour le champ Participants
         $reservation->Participants = json_encode($updatedParticipants);

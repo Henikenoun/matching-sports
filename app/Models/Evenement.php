@@ -18,7 +18,11 @@ class Evenement extends Model
     public function participants()
     {
         return $this->belongsToMany(User::class, 'evenement_participant', 'evenement_id', 'participant_id');
+<<<<<<< HEAD
     }
+=======
+
+>>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
     public function terrain()
     { 
         return $this->hasMany(Terrain::class,"terrain_id"); 
