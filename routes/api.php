@@ -3,24 +3,24 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategorieController;
-use App\Http\Controllers\ClubController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TerrainController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ClubController;
 use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\DemandePController;
+use App\Http\Controllers\EquipeController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StripeController;
 
-Route::post('/payment/processpayment', [StripeController::class,
-'processPayment']);
+Route::post('/payment/processpayment', [StripeController::class, 'processPayment']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
 
 // Routes for Reservation
 Route::middleware('api')->group(function () {
@@ -30,6 +30,20 @@ Route::middleware('api')->group(function () {
 // Routes for Evenements
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
+    Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
+});
+
+
+// Routes for Equipes
+Route::middleware('api')->group(function() {
+    Route::resource('equipes', EquipeController::class);
+});
+
+// Routes for Demandes
+Route::middleware('api')->group(function() {
+    Route::resource('demandes', DemandeController::class);
+    Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
+    Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
 });
 
 // Routes for Terrain
@@ -47,6 +61,7 @@ Route::get('/clubs/city/{city}', [ClubController::class, 'showClubsByCity']);
 Route::get('/clubs/{id}/terrains', [ClubController::class, 'showTerrainsInClub']);
 
 // Routes for User Authentication
+
 Route::group([
     'middleware' => 'api',
     'prefix' => 'users'
@@ -58,14 +73,20 @@ Route::group([
     Route::middleware('auth:api')->get('/user-profile', [AuthController::class, 'getUserProfile']);
     Route::get('/getAll', [AuthController::class, 'getall']);
     Route::put('/edit-profile', [AuthController::class, 'editProfile']);
+    Route::get('{id}', [AuthController::class, 'getUserById']);
 });
 Route::get('users/verify-email', [AuthController::class, 'verifyEmail'])->name('verify.email');
 
+
+
+
 // Routes for Chat
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:api')->group(function () {Route::get('/conversations/by-user-ids', [ChatController::class, 'getConversationByUserIds']);
     Route::get('/conversations', [ChatController::class, 'getConversations']);
     Route::post('/messages', [ChatController::class, 'sendMessage']);
     Route::post('/conversations', [ChatController::class, 'store']);
+    Route::get('/conversations/{id}', [ChatController::class, 'getConversationById']);
+    
 });
 
 // Routes for categories
@@ -81,17 +102,21 @@ Route::post('/shops/{id}/add-photos', [ShopController::class, 'addPhotos']);
 Route::get('/shops/{shopId}/categories', [ShopController::class, 'getCategoriesByShop']);
 Route::get('/shops/{shopId}/categories/{categoryId}/articles', [ShopController::class, 'getArticlesByCategoryAndShop']);
 
-
 // Routes for articles
 Route::middleware('api')->group(function () {
     Route::resource('articles', ArticleController::class);
 });
 Route::post('/articles/{id}/add-color', [ArticleController::class, 'addColor']);
 
-
 // Routes for demandes
-Route::post('/demandes', [DemandeController::class, 'createDemande']);
-Route::get('/demandes/{id}', [DemandeController::class, 'getDemandeDetails']);
-Route::get('/user/{userId}/demandes', [DemandeController::class, 'getAllDemandesByUser']);
-Route::get('/demandes', [DemandeController::class, 'getAllDemandes']);
+Route::post('/demandesP', [DemandePController::class, 'createDemande']);
+Route::get('/demandesP/{id}', [DemandePController::class, 'getDemandeDetails']);
+Route::get('/user/{userId}/demandesP', [DemandePController::class, 'getAllDemandesByUser']);
+Route::get('/demandesP', [DemandePController::class, 'getAllDemandes']);
+
+
+
+Route::get('/demandes/user/{userId}', [DemandePController::class, 'getAllDemandesByUser']);
+Route::get('/evenements/responsable/{responsableId}', [EvenementController::class, 'getEvenementsByResponsable']);
+Route::get('/evenements/p/{responsableId}', [EvenementController::class, 'getEvenementsByParticipant']);
 ?>

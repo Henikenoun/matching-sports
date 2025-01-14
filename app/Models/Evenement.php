@@ -13,6 +13,12 @@ class Evenement extends Model
     ,'prixUnitaire','responsable','participant','raison'];
 
 
+
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'evenement_participant', 'evenement_id', 'participant_id');
+    }
     public function terrain()
     { 
         return $this->hasMany(Terrain::class,"terrain_id"); 
@@ -25,10 +31,8 @@ class Evenement extends Model
 
 
 
-    public function particpant()
-    { 
-        return $this->hasMany(User::class,"participant"); 
-    }
+  
+
 
     public function responsable()
     { 

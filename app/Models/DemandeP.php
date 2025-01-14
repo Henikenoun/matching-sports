@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class DemandeP extends Model
 {
     use HasFactory;
-
+    protected $table = 'demandesP'; 
     protected $fillable = ['user_id', 'article_id', 'quantity','total'];
 
     public function user()

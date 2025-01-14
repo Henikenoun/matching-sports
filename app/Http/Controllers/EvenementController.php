@@ -13,13 +13,43 @@ class EvenementController extends Controller
     public function index()
     {
         try {
-            $evenements=Evenement::with('terrain')->get();
-            $evenements=Evenement::with('participant')->get();
-            $evenements=Evenement::with('responsable')->get();
+            //$evenements=Evenement::all();
+            //$evenements=Evenement::with('terrain')->get();
+            //$evenements=Evenement::with('participant')->get();
+            
+            //  $evenements=Evenement::with('responsable')->get();
+            //  $evenements=Evenement::with('club')->get();
+            $evenements = Evenement::with(['responsable', 'club'])->get();
+            
+
+
         
             return response()->json($evenements);
         } catch (\Exception $e) {
-        return response()->json("probleme de récupération de la liste des évenements");
+        return response()->json($e->getMessage());
+        }
+    }
+
+    //afficher les evenement d'un participant
+    public function getEvenementsByParticipant($participantId)
+    {
+        try {
+            $evenements = Evenement::whereHas('participants', function ($query) use ($participantId) {
+                $query->where('participant_id', $participantId);
+            })->with(['responsable', 'club'])->get();
+    
+            if ($evenements->isEmpty()) {
+                return response()->json([
+                    'message' => 'Aucun événement trouvé pour ce participant'
+                ], 404); // 404 Not Found
+            }
+    
+            return response()->json($evenements, 200); // 200 OK
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erreur lors de la récupération des événements',
+                'details' => $e->getMessage()
+            ], 500); // 500 Internal Server Error
         }
     }
 
@@ -32,7 +62,8 @@ class EvenementController extends Controller
     {
         try {
             $evenement=new Evenement([
-                "IDTerrain"=>$request->input("IDTerrain"),
+                "terrain_id"=>$request->input("terrain_id"),
+                "club_id"=>$request->input("club_id"),
                 "nom"=>$request->input("nom"),
                 "type"=>$request->input("type"),
                 "nombreMax"=>$request->input("nombreMax"),
@@ -42,7 +73,7 @@ class EvenementController extends Controller
                 "photo"=>$request->input("photo"),
                 "prixUnitaire"=>$request->input("prixUnitaire"),
                 "responsable"=>$request->input("responsable"),
-                "participant"=>$request->input("participant"),
+                //"participant"=>$request->input("participant"),
                 "raison"=>$request->input("raison"),
 
             ]);
@@ -51,16 +82,64 @@ class EvenementController extends Controller
             
             
         } catch (\Exception $e) {
-           return response()->json("insertion impossible");
+           return response()->json($e->getMessage());
         }
     }
+    
+    public function ajouterParticipant(Request $request, $id)
+    {
+        try {
+            $evenement = Evenement::findOrFail($id);
+            $participants = $request->input('participants'); // Expecting an array of participant IDs
+    
+            if ($evenement->nbActuel + count($participants) <= $evenement->nombreMax) {
+                $evenement->participants()->attach($participants);
+                $evenement->nbActuel += count($participants);
+                $evenement->save();
+    
+                return response()->json($evenement);
+            } else {
+                return response()->json("nombre maximal de participants atteint", 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    // public function ajouterParticipant(Request $request,$id)
+    // {
+    //     try {
+    //         $evenement=Evenement::findorFail($id);
+
+    //         if($evenement->nbActuel<$evenement->nombreMax)
+    //         {
+    //             $evenement->nbActuel=$evenement->nbActuel+1;
+    //             $evenement->participants=$request->input("participants");
+    //             $evenement->save();
+    //             return response()->json($evenement);
+    //         }
+    //         else
+    //         {
+    //             return response()->json("nombre maximal de participants atteint");
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json($e->getMessage(), 500);
+    //     }
+    // }
+    
+
 
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
-       //
+        try {
+            $evenement=Evenement::findorFail($id);
+            return response()->json($evenement);
+        } catch (\Exception $e) {
+            return response()->json("probleme de récupération de l'evenement");
+        }
     }
 
     /**
@@ -81,20 +160,73 @@ class EvenementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+//     public function destroy($id,Request $request)
+//     {
+//         try {
+            
+//             $evenement=Evenement::findOrFail($id);
+//             $raison=$request->input('raison');
+//             if($evenement->raison=="")
+//             {
+//                 return response()->json("Il faut remplir le champ raison ");
+//             }
+// $evenement->raison=$raison;
+//             $evenement->delete();
+//             return response()->json("Evenement supprimée avec succes");
+//         } catch (\Exception $e) {
+//             return response()->json("probleme de suppression d'evenement");
+//         }
+//     }
+
+public function destroy(Request $request, $id)
+{
+    try {
+        $evenement = Evenement::findOrFail($id);
+        $raison = $request->input('raison');
+
+        if (empty($raison)) {
+            return response()->json("Il faut remplir le champ raison", 400);
+        }
+
+        $evenement->raison = $raison;
+        $evenement->delete();
+
+        return response()->json("Evenement supprimé avec succès");
+    } catch (\Exception $e) {
+        return response()->json("Problème de suppression d'événement", 500);
+ 
+   }
+
+}
+
+
+
+   public function getEvenementsByResponsable($responsableId)
     {
         try {
-            
-            $evenement=Evenement::findOrFail($id);
-            if($evenement->raison=="")
-            {
-                return response()->json("Il faut remplir le champ raison ");
+            $evenements = Evenement::where('responsable', $responsableId)->with(['responsable', 'club'])->get();
+    
+            if ($evenements->isEmpty()) {
+                return response()->json([
+                    'message' => 'Aucun événement trouvé pour ce responsable'
+                ], 404); // 404 Not Found
             }
-
-            $evenement->delete();
-            return response()->json("Evenement supprimée avec succes");
+    
+            return response()->json($evenements, 200); // 200 OK
         } catch (\Exception $e) {
-            return response()->json("probleme de suppression d'evenement");
+            return response()->json([
+                'error' => 'Erreur lors de la récupération des événements',
+                'details' => $e->getMessage()
+            ], 500); // 500 Internal Server Error
         }
+
     }
+
+
+
+
+
+
+
+
 }

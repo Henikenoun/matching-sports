@@ -70,22 +70,35 @@ class ShopController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
-        try {
-            $shop = Shop::findOrFail($id);
+{
+    try {
+        $shop = Shop::findOrFail($id);
 
-            $shop->update($request->all());
+        // Vérification et décodage de la photo/JSON
+        if ($request->has('photo') && is_string($request->photo)) {
+            $decodedPhoto = json_decode($request->photo, true);
 
-            return response()->json($shop, 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Shop non trouvé.'], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la mise à jour du shop.',
-                'details' => $e->getMessage()
-            ], 500);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $request->merge(['photo' => $decodedPhoto]);
+            } else {
+                return response()->json(['error' => 'Format JSON invalide pour la photo.'], 400);
+            }
         }
+
+        // Mise à jour des données
+        $shop->update($request->all());
+
+        return response()->json($shop, 200);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['message' => 'Shop non trouvé.'], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Erreur lors de la mise à jour du shop.',
+            'details' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * Remove the specified resource from storage.

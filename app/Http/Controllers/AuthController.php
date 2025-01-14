@@ -13,6 +13,12 @@ use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
+    // Get user by id 
+  
+
+
+     
+
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
@@ -34,49 +40,51 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        try{
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'surname' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'password_confirmation' => 'required|string',
-            'role' => 'required|string|in:admin,user,owner',
-            'date_of_birth' => 'required|date',
-            'city' => 'required|string|max:100',
-            'phone_number' => 'required|string|max:20',
-            'photo' => 'nullable|string',
-            'availability' => 'required|boolean',
-            'transport' => 'required|boolean',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|between:2,100',
+                'surname' => 'required|string|between:2,100',
+                'email' => 'required|string|email|max:100|unique:users',
+                'password' => 'required|string|confirmed|min:6',
+                'password_confirmation' => 'required|string',
+                'role' => 'required|string|in:admin,user,owner',
+                'date_of_birth' => 'required|date',
+                'city' => 'required|string|max:100',
+                'phone_number' => 'required|string|max:20',
+                'photo' => 'nullable|string',
+                'availability' => 'required|boolean',
+                'transport' => 'required|boolean',
+                'club_id' => 'nullable|exists:clubs,id',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+            if ($validator->fails()) {
+                return response()->json($validator->errors()->toJson(), 400);
+            }
+
+            $user = User::create(array_merge(
+                $validator->validated(),
+                ['password' => bcrypt($request->password)]
+            ));
+
+            $verificationUrl = route('verify.email', ['email' => $user->email]);
+            Mail::send([], [], function ($message) use ($user, $verificationUrl) {
+                $message->to($user->email)
+                    ->subject('Verification de votre email')
+                    ->html("<h2>{$user->name}! Merci de vous être inscrit sur notre site</h2>
+                            <h4>Veuillez vérifier votre email pour continuer...</h4>
+                            <a href='{$verificationUrl}'>Cliquez ici</a>");
+            });
+
+            return response()->json([
+                'message' => 'User successfully registered. Please verify your email.',
+                'user' => $user
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'User registration failed! Please try again.',
+                'error' => $e->getMessage()
+            ], 409);
         }
-
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password' => bcrypt($request->password)]
-        ));
-
-        $verificationUrl = route('verify.email', ['email' => $user->email]);
-        Mail::send([], [], function ($message) use ($user, $verificationUrl) {
-            $message->to($user->email)
-                ->subject('Verification de votre email')
-                ->html("<h2>{$user->name}! Merci de vous être inscrit sur notre site</h2>
-                        <h4>Veuillez vérifier votre email pour continuer...</h4>
-                        <a href='{$verificationUrl}'>Cliquez ici</a>");
-        });
-
-        return response()->json([
-            'message' => 'User successfully registered. Please verify your email.',
-            'user' => $user
-        ], 201);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'User registration failed! Please try again.',
-            'error' => $e->getMessage()
-        ], 409);}
     }
 
     public function verifyEmail(Request $request)
@@ -124,8 +132,6 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-           
-
             $newToken = JWTAuth::refresh();
             return $this->createNewToken($newToken);
         } catch (JWTException $e) {
@@ -134,38 +140,44 @@ class AuthController extends Controller
     }
 
     public function getall(Request $request)
-{
-    $user =User::all(); // Ensure the user is authenticated
-    if ($user) {
-        return response()->json($user); // Return the user profile
-    } else {
-        return response()->json(['error' => 'No user found'], 404);
-    }
-}
-public function getUserProfile()
-{
-    try {
-        $user = Auth::user();
-
-        if ($user) {
-            return response()->json([
-                'message' => 'User profile retrieved successfully.',
-                'user' => $user
-            ], 200);
+    {
+        $users = User::all(); // Fetch all users
+        if ($users->isEmpty()) {
+            return response()->json(['error' => 'No user found'], 404);
         } else {
-            return response()->json(['error' => 'No authenticated user found.'], 404);
+            return response()->json($users); // Return the users
         }
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'An error occurred',
-            'message' => $e->getMessage()
-        ], 500);
     }
-}
 
+    public function getUserProfile()
+    {
+        try {
+            $user = Auth::user();
 
-
-
+            if ($user) {
+                return response()->json([
+                    'message' => 'User profile retrieved successfully.',
+                    'user' => $user
+                ], 200);
+            } else {
+                return response()->json(['error' => 'No authenticated user found.'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getUserById($id)
+    {
+        $user = User::with('club')->find($id);
+        if ($user) {
+            return response()->json($user);
+        } else {
+            return response()->json(['error' => 'No user found'], 404);
+        }
+    }
     protected function createNewToken($token)
     {
         return response()->json([
@@ -176,10 +188,10 @@ public function getUserProfile()
         ]);
     }
 
-    public function editProfile(Request $request,$id)
+    public function editProfile(Request $request, $id)
     {
         $user = User::find($id);
-    
+
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|between:2,100',
             'surname' => 'sometimes|required|string|between:2,100',
@@ -192,16 +204,16 @@ public function getUserProfile()
             'availability' => 'sometimes|required|boolean',
             'transport' => 'sometimes|required|boolean',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-    
+
         $data = $validator->validated();
         unset($data['isActive'], $data['role']);
-    
+
         $user->update($data);
-    
+
         return response()->json([
             'message' => 'Profile successfully updated.',
             'user' => $user

@@ -13,17 +13,19 @@ return new class extends Migration
     {
         Schema::create('evenements', function (Blueprint $table) {
             $table->id();
-        $table->unsignedBigInteger('terrain_id');
-        $table->unsignedBigInteger('club_id');
-        $table->string('nom');
-        $table->string('type');
-        $table->integer('nombreMax');
-        $table->date('date');
-        $table->integer('nbActuel');
+
+        $table->unsignedBigInteger('terrain_id')->nullable();
+        $table->unsignedBigInteger('club_id')->nullable();
+        $table->string('nom')->nullable();
+        $table->string('type')->nullable();
+        $table->integer('nombreMax')->nullable();
+        $table->date('date')->nullable();
+        $table->integer('nbActuel')->nullable();
         $table->text('description')->nullable();
         $table->string('photo')->nullable();
-        $table->decimal('prixUnitaire', 8, 2);
-        $table->unsignedBigInteger('responsable');
+        $table->decimal('prixUnitaire', 8, 2)->nullable();
+        $table->unsignedBigInteger('responsable')->nullable();
+
         $table->unsignedBigInteger('participant')->nullable();  
         $table->text('raison')->nullable();
         $table->timestamps();

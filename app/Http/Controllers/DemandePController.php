@@ -14,26 +14,27 @@ class DemandePController extends Controller
      * Ajouter une demande.
      */
     public function createDemande(Request $request)
-    {
-        try {
-            $demande = DemandeP::create([
-                'user_id' => $request->user_id,
-                'article_id' => $request->article_id,
-                'quantity' => $request->quantity,
-                'total' => $request->total
-            ]);
+{
+    try {
+        $demande = DemandeP::create([
+            'user_id' => $request->user_id,
+            'article_id' => $request->article_id,
+            'quantity' => $request->quantity,
+            'total' => $request->total
+        ]);
 
-            return response()->json([
-                'message' => 'Demande créée avec succès',
-                'demande' => $demande
-            ], 201); // 201 Created
-        } catch (Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la création de la demande',
-                'details' => $e->getMessage()
-            ], 500); // 500 Internal Server Error
-        }
+        return response()->json([
+            'message' => 'Demande créée avec succès',
+            'demande' => $demande
+        ], 201); // 201 Created
+    } catch (Exception $e) {
+        return response()->json([
+            'request' => $request->query->all(),
+            'error' => 'Erreur lors de la création de la demande',
+            'details' => $e->getMessage()
+        ], 500); // 500 Internal Server Error
     }
+}
 
     /**
      * Récupérer les détails d'une demande.

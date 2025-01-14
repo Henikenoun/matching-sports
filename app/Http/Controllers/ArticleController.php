@@ -56,9 +56,10 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Article $article)
+    public function show(int $id)
     {
         try {
+            $article = Article::findOrFail($id);
             return response()->json($article); 
         } catch (\Exception $e) {
             return response()->json([
