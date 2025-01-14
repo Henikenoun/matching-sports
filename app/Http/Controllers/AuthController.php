@@ -13,25 +13,12 @@ use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
-<<<<<<< HEAD
     // Get user by id 
   
 
 
      
 
-=======
-    //get user by id 
-    public function getUserById($id)
-    {
-        $user = User::find($id);
-        if ($user) {
-            return response()->json($user);
-        } else {
-            return response()->json(['error' => 'No user found'], 404);
-        }
-    }
->>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
@@ -53,7 +40,6 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-<<<<<<< HEAD
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|between:2,100',
@@ -70,24 +56,6 @@ class AuthController extends Controller
                 'transport' => 'required|boolean',
                 'club_id' => 'nullable|exists:clubs,id',
             ]);
-=======
-        try{
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'surname' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'password_confirmation' => 'required|string',
-            'role' => 'required|string|in:admin,user,owner',
-            'date_of_birth' => 'required|date',
-            'city' => 'required|string|max:100',
-            'phone_number' => 'required|string|max:20',
-            'photo' => 'nullable|string',
-            'availability' => 'required|boolean',
-            'transport' => 'required|boolean',
-            'club_id' => 'nullable|exists:clubs,id',
-        ]);
->>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
 
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 400);

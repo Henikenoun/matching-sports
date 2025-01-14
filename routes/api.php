@@ -30,7 +30,6 @@ Route::middleware('api')->group(function () {
 // Routes for Evenements
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
-<<<<<<< HEAD
     Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
 });
 
@@ -45,28 +44,7 @@ Route::middleware('api')->group(function() {
     Route::resource('demandes', DemandeController::class);
     Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
     Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
-=======
-
->>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
 });
-
-
-    Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
-
-    Route::middleware('api')->group(function() {
-        Route::resource('equipes', EquipeController::class);
-    });
-    
-    Route::middleware('api')->group(function() {
-        Route::resource('demandes', DemandeController::class);
-        Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
-        Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
-    });
-    
-    // Route::middleware('api')->group(function() {
-    //     Route::resource('Users', DemandeController::class);
-    //     Route::put('/Users/{id}/status', [AuthController::class, 'updateAvailability']);
-    // });
 
 // Routes for Terrain
 Route::middleware('api')->group(function () {
@@ -83,11 +61,7 @@ Route::get('/clubs/city/{city}', [ClubController::class, 'showClubsByCity']);
 Route::get('/clubs/{id}/terrains', [ClubController::class, 'showTerrainsInClub']);
 
 // Routes for User Authentication
-<<<<<<< HEAD
 
-=======
-Route::get('/users/{id}', [AuthController::class, 'getUserById']);
->>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
 Route::group([
     'middleware' => 'api',
     'prefix' => 'users'
@@ -139,7 +113,6 @@ Route::post('/demandesP', [DemandePController::class, 'createDemande']);
 Route::get('/demandesP/{id}', [DemandePController::class, 'getDemandeDetails']);
 Route::get('/user/{userId}/demandesP', [DemandePController::class, 'getAllDemandesByUser']);
 Route::get('/demandesP', [DemandePController::class, 'getAllDemandes']);
-<<<<<<< HEAD
 
 
 
@@ -147,7 +120,3 @@ Route::get('/demandes/user/{userId}', [DemandePController::class, 'getAllDemande
 Route::get('/evenements/responsable/{responsableId}', [EvenementController::class, 'getEvenementsByResponsable']);
 Route::get('/evenements/p/{responsableId}', [EvenementController::class, 'getEvenementsByParticipant']);
 ?>
-=======
-?>
-
->>>>>>> fce54fef574bbd97f87739dcdc034b22625b8727
