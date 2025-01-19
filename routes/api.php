@@ -24,15 +24,15 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// routes pour les notifications
-Route::get('/notificationsEvents', [NotificationController::class, 'showEventNotifications']);
-Route::get('/notifications/events/annulations', [NotificationController::class, 'showEventNotificationsAnnulation']);
-Route::get('/notifications/reservations/refus', [NotificationController::class, 'showReservationNotificationsRefus']);
-Route::get('/notifications/reservations/accept', [NotificationController::class, 'showReservationNotificationsAccept']);
-Route::get('/notifications/reservations/demande', [NotificationController::class, 'showReservationNotificationsDemande']);
-Route::get('/notifications/demandes', [NotificationController::class, 'showDemandeNotifications']);
-Route::get('/notifications/demandes/accept', [NotificationController::class, 'showDemandeNotificationsAccept']);
-Route::get('/notifications/demandes/refus', [NotificationController::class, 'showDemandeNotificationsRefus']);
+// Routes for Notifications
+Route::get('/notifications/user/{id}', [NotificationController::class, 'showUserNotifications']);
+Route::get('/notifications/user/{id}/events', [NotificationController::class, 'showUserEventNotifications']);
+Route::get('/notifications/user/{id}/events/cancelled', [NotificationController::class, 'showUserEventCancelledNotifications']);
+Route::get('/notifications/user/{id}/reservations', [NotificationController::class, 'showUserNewReservationNotifications']);
+Route::get('/notifications/user/{id}/reservations/responses', [NotificationController::class, 'showUserReservationResponseNotifications']);
+Route::get('/notifications/user/{id}/demandes', [NotificationController::class, 'showUserNewDemandeNotifications']);
+Route::get('/notifications/user/{id}/demandes/responses', [NotificationController::class, 'showUserDemandeResponseNotifications']);
+
 
 
 //route pour rating 
@@ -50,6 +50,8 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::resource('evenements', EvenementController::class);
     Route::put('/evenements/ajouterParticipant/{id}', [EvenementController::class, 'ajouterParticipant']);
+    // route pour annuler un evenement
+    Route::put('/evenements/{id}/annuler', [EvenementController::class, 'annulerEvenement']);
 });
 
 
@@ -63,6 +65,8 @@ Route::middleware('api')->group(function() {
     Route::resource('demandes', DemandeController::class);
     Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
     Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
+    Route::post('/demandes/{id}/refuser', [DemandeController::class, 'refuse']);
+    Route::post('/demandes/{id}/accepter', [DemandeController::class, 'accepter']);
 });
 
 // Routes for Terrain

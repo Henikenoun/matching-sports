@@ -18,10 +18,11 @@ class NewReservation extends Notification
      *
      * @return void
      */
-    public function __construct(Reservation $reservation)
-    {
-        $this->reservation = $reservation;
-    }
+   
+     public function __construct($reservation)
+     {
+         $this->reservation = $reservation->load('user', 'club'); // Charger les relations user et club
+     }
 
     /**
      * Get the notification's delivery channels.
@@ -49,11 +50,10 @@ class NewReservation extends Notification
      * @return array
      */
     public function toArray($notifiable)
-    {
-        return [
-            'reservation_id' => $this->reservation->ID,
-            'user_reserve' => $this->reservation->User_Reserve,
-            'date_reservation' => $this->reservation->Date_Reservation,
-        ];
-    }
+{
+    return [
+        'message' => "L'utilisateur {$this->reservation->user->name} a demandé une réservation pour le terrain {$this->reservation->Terrain}.", // Ajout du message personnalisé
+
+    ];
+}
 }

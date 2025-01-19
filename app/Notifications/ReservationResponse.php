@@ -42,15 +42,15 @@ class ReservationResponse extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable)            
     {
         $message = $this->responseType === 'accepted' 
-            ? 'Votre réservation a été acceptée.' 
-            : 'Votre réservation a été refusée.';
-
+            ? "Votre réservation pour le terrain {$this->reservation->Terrain} au club {$this->reservation->club->nom} à la date {$this->reservation->Date_Reservation} a été acceptée." 
+            : "Votre réservation pour le terrain {$this->reservation->Terrain} au club {$this->reservation->club->nom} à la date {$this->reservation->Date_Reservation} a été refusée.";
+    
         return [
-            'reservation_id' => $this->reservation->ID,
-            'message' => $message,
+            
+            'message' => $message, // Ajout du message personnalisé
         ];
     }
-}
+    }

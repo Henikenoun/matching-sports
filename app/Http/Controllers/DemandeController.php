@@ -8,6 +8,8 @@ use DateTime;
 use App\Models\User;
 use App\Notifications\DemandeResponse;
 use App\Notifications\NewDemande;
+use Illuminate\Support\Facades\Log; // Assurez-vous d'importer correctement la façade Log
+
 
 class DemandeController extends Controller
 {
@@ -293,8 +295,128 @@ public function accept($id)
             ], 500);
         }
     }
+//une méthode pour refus une demande et envoyer une notification à l'utilisateur
+public function refuse($id)
+    {
+        try {
+            // Recherche de la demande et chargement des relations nécessaires
+            $demande = Demande::with(['user', 'equipe'])->findOrFail($id);
+            $user = $demande->user; // Relation définie entre Demande et User
 
-    
+            // Vérification du statut de la demande
+            if ($demande->etat === 'en cours') {
+                $demande->etat = 'refusée';
+            } else {
+                return response()->json([
+                    "message" => "Impossible de changer le statut en 'refusée'. La demande est déjà acceptée ou refusée.",
+                ], 400);
+            }
 
+            $demande->save();
 
+            // Vérification des relations
+            if (!$demande->equipe) {
+                Log::error('Demande ID ' . $demande->id . ' n\'a pas d\'équipe associée.');
+                return response()->json([
+                    "message" => "Les informations de la demande sont incomplètes : équipe manquante.",
+                ], 400);
+            }
+
+            if (!$demande->user) {
+                Log::error('Demande ID ' . $demande->id . ' n\'a pas d\'utilisateur associé.');
+                return response()->json([
+                    "message" => "Les informations de la demande sont incomplètes : utilisateur manquant.",
+                ], 400);
+            }
+
+            // Log avant d'envoyer la notification
+            Log::info('Envoi de la notification de refus pour la demande ID: ' . $demande->id);
+
+            // Envoyer la notification de refus
+            $notification = new DemandeResponse($demande, 'refusée');
+            $user->notify($notification);
+
+            // Log après l'envoi de la notification
+            Log::info('Notification de refus envoyée pour la demande ID: ' . $demande->id);
+
+            return response()->json([
+                "message" => "Demande refusée avec succès.",
+                "notification" => $notification->toArray($user)
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Demande introuvable: ' . $e->getMessage());
+            return response()->json([
+                "message" => "Demande introuvable",
+                "error" => $e->getMessage(),
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du refus de la demande: ' . $e->getMessage());
+            return response()->json([
+                "message" => "Erreur lors du refus de la demande",
+                "error" => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function accepter($id)
+    {
+        try {
+            // Recherche de la demande et chargement des relations nécessaires
+            $demande = Demande::with(['user', 'equipe'])->findOrFail($id);
+            $user = $demande->user; // Relation définie entre Demande et User
+
+            // Vérification du statut de la demande
+            if ($demande->etat === 'en cours') {
+                $demande->etat = 'acceptée';
+            } else {
+                return response()->json([
+                    "message" => "Impossible de changer le statut en 'acceptée'. La demande est déjà acceptée ou refusée.",
+                ], 400);
+            }
+
+            $demande->save();
+
+            // Vérification des relations
+            if (!$demande->equipe) {
+                Log::error('Demande ID ' . $demande->id . ' n\'a pas d\'équipe associée.');
+                return response()->json([
+                    "message" => "Les informations de la demande sont incomplètes : équipe manquante.",
+                ], 400);
+            }
+
+            if (!$demande->user) {
+                Log::error('Demande ID ' . $demande->id . ' n\'a pas d\'utilisateur associé.');
+                return response()->json([
+                    "message" => "Les informations de la demande sont incomplètes : utilisateur manquant.",
+                ], 400);
+            }
+
+            // Log avant d'envoyer la notification
+            Log::info('Envoi de la notification d\'acceptation pour la demande ID: ' . $demande->id);
+
+            // Envoyer la notification d'acceptation
+            $notification = new DemandeResponse($demande, 'acceptée');
+            $user->notify($notification);
+
+            // Log après l'envoi de la notification
+            Log::info('Notification d\'acceptation envoyée pour la demande ID: ' . $demande->id);
+
+            return response()->json([
+                "message" => "Demande acceptée avec succès.",
+                "notification" => $notification->toArray($user)
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Demande introuvable: ' . $e->getMessage());
+            return response()->json([
+                "message" => "Demande introuvable",
+                "error" => $e->getMessage(),
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'acceptation de la demande: ' . $e->getMessage());
+            return response()->json([
+                "message" => "Erreur lors de l'acceptation de la demande",
+                "error" => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

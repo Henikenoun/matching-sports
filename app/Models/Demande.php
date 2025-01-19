@@ -11,14 +11,21 @@ class Demande extends Model
 
     protected $fillable = ['user_id','equipe_id','etat','date',];
 
-     public function user()
+    public function user()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsTo(User::class);
     }
 
+    // Relation avec le modèle Equipe
+    public function equipe()
+    {
+        return $this->belongsTo(Equipe::class);
+    }
 
-    public function equipe(){
-        return $this->belongsTo(Equipe::class,'equipe_id');
+    // Relation avec le modèle Terrain
+    public function terrain()
+    {
+        return $this->belongsTo(Terrain::class);
     }
 
 }

@@ -43,9 +43,8 @@ class NewDemande extends Notification
     public function toArray($notifiable)
     {
         return [
-            'demande_id' => $this->demande->ID,
-            'user_demande' => $this->demande->User_Demande,
-            'date_demande' => $this->demande->Date_Demande,
+            
+            'message' => "L'utilisateur {$this->demande->user->name} a soumis une demande pour l'équipe {$this->demande->equipe->name}.", // Ajout du message personnalisé
         ];
     }
 }
