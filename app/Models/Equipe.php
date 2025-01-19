@@ -11,10 +11,10 @@ class Equipe extends Model
 
     protected $fillable = ['nom', 'type', 'nombre', 'reservation_id','participants'];
 
-    // public function reservation()
-    // {
-    //     return $this->belongsTo(Reservation::class,'reservation_id');
-    // }
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class,'reservation_id');
+    }
 
     public function demandes()
     {
