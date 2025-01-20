@@ -30,4 +30,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(Club::class, 'club_id'); // Relation avec Terrain
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'User_Reserve');
+    }
 }

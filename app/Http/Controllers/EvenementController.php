@@ -231,6 +231,32 @@ public function destroy(Request $request, $id)
 
     }
 
+    //fonction pour annuler une evenement
+    public function annulerEvenement( Request $request,$id)
+    {
+        try {
+            $evenement = Evenement::findOrFail($id);
+            $raison = $request->input('raison');
+
+            if (empty($raison)) {
+                return response()->json("Il faut remplir le champ raison", 400);
+            }
+
+            $evenement->raison = $raison;
+            $evenement->save();
+
+            // Send notifications to all users
+            $users = User::all();
+            foreach ($users as $user) {
+                $user->notify(new EventCancelled($evenement));
+            }
+
+            return response()->json("Evenement annulé avec succès");
+        } catch (\Exception $e) {
+            return response()->json("Problème d'annulation de l'événement", 500);
+        }
+    }
+
 
 
 

@@ -30,8 +30,12 @@ class NewEvent extends Notification
     public function toArray($notifiable)
     {
         return [
-            'message' => "Nouvel événement : {$this->event->name}.",
+            'message' => "Nouvel événement : {$this->event->nom}.",
+            'event_name' => $this->event->nom, // Ajout du nom de l'événement
+            'club' => $this->event->club->nom, // Ajout du nom du club
+            'date_creation' => $this->event->created_at->format('Y-m-d H:i:s'),
             'event_id' => $this->event->id,
         ];
     }
 }
+

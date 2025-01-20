@@ -3,9 +3,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\DatabaseMessage;
 use App\Models\Demande;
+use Illuminate\Support\Facades\Log;
 
 class DemandeResponse extends Notification
 {
@@ -14,43 +13,35 @@ class DemandeResponse extends Notification
     protected $demande;
     protected $responseType;
 
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
     public function __construct(Demande $demande, $responseType)
     {
         $this->demande = $demande;
         $this->responseType = $responseType;
+
+        // Log the responseType to verify it is correctly assigned
+        Log::info('DemandeResponse created with responseType: ' . $responseType);
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
     public function via($notifiable)
     {
         return ['database'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
     public function toArray($notifiable)
     {
-        $message = $this->responseType === 'accepted' 
-            ? 'Votre demande a été acceptée.' 
-            : 'Votre demande a été refusée.';
+        $message = $this->responseType === 'acceptée' 
+            ? "Votre demande pour rejoindre l'équipe {$this->demande->equipe->nom} a été acceptée." 
+            : "Votre demande pour rejoindre l'équipe {$this->demande->equipe->nom} a été refusée.";
+
+        // Log the message to verify the correct message is being generated
+        Log::info('DemandeResponse toArray message: ' . $message);
 
         return [
-            'demande_id' => $this->demande->ID,
-            'message' => $message,
+            'demande_id' => $this->demande->id,
+            'equipe_id' => $this->demande->equipe ? $this->demande->equipe->id : null,
+            'equipe' => $this->demande->equipe ? $this->demande->equipe->name : null,
+            'user' => $this->demande->user ? $this->demande->user->name : null,
+            'message' => $message, // Ajout du message personnalisé
         ];
     }
 }
