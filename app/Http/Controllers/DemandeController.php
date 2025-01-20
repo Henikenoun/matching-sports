@@ -8,6 +8,7 @@ use DateTime;
 use App\Models\User;
 use App\Notifications\DemandeResponse;
 use App\Notifications\NewDemande;
+use Illuminate\Support\Facades\DB;
 
 class DemandeController extends Controller
 {
@@ -53,14 +54,42 @@ class DemandeController extends Controller
             $demande->save();
 
             // Récupération de l'utilisateur pour l'envoyer la notification
-        $user = User::find($validatedData["user_id"]);
-        $user->notify(new NewDemande($demande));
+            
+        // $user = User::find($validatedData["user_id"]);
+        // $user->notify(new NewDemande($demande));
+        // Récupération de l'équipe pour envoyer la notification
+        $equipe = $demande->load('equipe')->equipe;
+        if ($equipe) {
+            $userEquipe = User::find($equipe->user_id);
+            if ($userEquipe) {
+                $userEquipe->notify(new NewDemande($demande));
+            }
+        }
+        // Récupération de toutes les réservations
+        $reservations = DB::table('reservations')->get();
 
-    
+        // Recherche de la réservation contenant l'équipe dans les participants
+        foreach ($reservations as $reservation) {
+            $participants = json_decode($reservation->Participants, true);
+            foreach ($participants as $participant) {
+                if (isset($participant['equipe']) && $participant['equipe'] == $validatedData["equipe_id"]) {
+                    // Réservation trouvée
+                    $userEquipe = User::find($participant['user']);
+                    if ($userEquipe) {
+                        $userEquipe->notify(new NewDemande($demande));
+                    }
+                    $reservationFound = $reservation;
+                    break 2;
+                }
+            }
+        }
+
             return response()->json([
                 "message" => "Demande créée avec succès",
                 "demande" => $demande,
+                "reservation" => $reservationFound ?? null,
             ], 201);
+        
         } catch (\Exception $e) {
             return response()->json([
                 "message" => "Erreur lors de la création de la demande",
@@ -68,7 +97,7 @@ class DemandeController extends Controller
             ], 500);
         }
     }
-    
+  
 
     /**
      * Display the specified resource.

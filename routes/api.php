@@ -63,6 +63,8 @@ Route::middleware('api')->group(function() {
     Route::resource('demandes', DemandeController::class);
     Route::put('/demandes/{id}/status', [DemandeController::class, 'updateStatus']);
     Route::delete('/demandes/{id}/annulation', [DemandeController::class, 'annulation']);
+Route::post('/demandes/{id}/refuser', [DemandeController::class, 'refuse']);
+    Route::post('/demandes/{id}/accepter', [DemandeController::class, 'accepter']);
 });
 
 // Routes for Terrain
@@ -117,6 +119,7 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::resource('shops', ShopController::class);
 });
+
 Route::post('/shops/{id}/add-photos', [ShopController::class, 'addPhotos']);
 Route::get('/shops/{shopId}/categories', [ShopController::class, 'getCategoriesByShop']);
 Route::get('/shops/{shopId}/categories/{categoryId}/articles', [ShopController::class, 'getArticlesByCategoryAndShop']);
